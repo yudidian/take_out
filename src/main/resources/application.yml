@@ -1,0 +1,42 @@
+server:
+  port: 8080
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/email/
+    check-template: true
+    cache: true
+    suffix: .html
+    mode: HTML5
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: 1848761082@qq.com
+    password: udulgvsejvjobead
+    default-encoding: utf-8
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: smtp.qq.com
+          auth: true
+          starttls:
+            required: true
+            enable: true
+  application:
+    name: takeOut
+  datasource:
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/take_out
+      username: root
+      password: root
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+
+kola:
+  path: E:\kola_image\
