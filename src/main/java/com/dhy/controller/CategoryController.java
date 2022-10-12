@@ -69,7 +69,7 @@ public class CategoryController {
     List<Category> categories = categoryService.list(queryWrapper);
     List<Map<String, Object>> collect = categories.stream().map(item -> {
       Map<String, Object> map = new HashMap<>();
-      map.put("id", item.getId());
+      map.put("id", item.getId().toString());
       map.put("type", item.getType());
       map.put("name", item.getName());
       return map;

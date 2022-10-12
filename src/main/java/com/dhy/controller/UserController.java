@@ -26,6 +26,9 @@ public class UserController {
 
   @PostMapping("/login")
   public R<Map> login(@RequestBody Map<String,Object> map, HttpSession session){
+    if (session.getAttribute("code") == null) {
+      return R.error("验证码未发送");
+    }
     String code = session.getAttribute("code").toString();
     long time = (long) session.getAttribute("timeOut");
     if (new Date().getTime() - time > 1000*60*5) {
