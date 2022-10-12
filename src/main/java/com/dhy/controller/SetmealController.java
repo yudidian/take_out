@@ -1,9 +1,11 @@
 package com.dhy.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dhy.DTO.SetmealDto;
 import com.dhy.common.R;
+import com.dhy.entity.Category;
 import com.dhy.entity.Setmeal;
 import com.dhy.service.SetmealDishService;
 import com.dhy.service.SetmealService;
@@ -51,13 +53,24 @@ public class SetmealController {
   @PutMapping("/list")
   public R<String> updateList(@RequestBody SetmealDto setmealDto) {
     LambdaUpdateWrapper<Setmeal> updateWrapper = new LambdaUpdateWrapper<>();
-    updateWrapper.in(Setmeal::getId,setmealDto.getIds());
-    setmealService.update(setmealDto,updateWrapper);
-    return R.success(null,"修改成功");
+    updateWrapper.in(Setmeal::getId, setmealDto.getIds());
+    setmealService.update(setmealDto, updateWrapper);
+    return R.success(null, "修改成功");
   }
+
   @DeleteMapping("/list")
-  public R<String> deleteList(@RequestParam List<Long> ids){
+  public R<String> deleteList(@RequestParam List<Long> ids) {
     setmealService.deleteByIds(ids);
-    return R.success(null,"删除成功");
+    return R.success(null, "删除成功");
+  }
+
+  @GetMapping("/list")
+  public R<List<Setmeal>> getSetmealList(Setmeal setmeal) {
+    LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(setmeal.getCategoryId() != null, Setmeal::getCategoryId, setmeal.getCategoryId());
+    lambdaQueryWrapper.eq(setmeal.getStatus() != null, Setmeal::getStatus, setmeal.getStatus());
+    lambdaQueryWrapper.orderByDesc(Setmeal::getUpdateTime);
+    List<Setmeal> list = setmealService.list(lambdaQueryWrapper);
+    return R.success(list,"获取成功");
   }
 }
