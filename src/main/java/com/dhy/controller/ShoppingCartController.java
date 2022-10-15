@@ -22,7 +22,7 @@ public class ShoppingCartController {
   private ShoppingCartService shoppingCartService;
 
 //  添加进购物车
-  @PostMapping
+  @PostMapping("/add")
   public R<ShoppingCart> add(@RequestBody ShoppingCart shoppingCart, HttpSession session) {
     Long userId = Long.valueOf(session.getAttribute("userId").toString());
     shoppingCart.setUserId(userId);
@@ -45,6 +45,8 @@ public class ShoppingCartController {
     return R.success(cart, "添加成功");
   }
 //  获取购物车列表
+
+  @GetMapping("/list")
   public R<List<ShoppingCart>> list(HttpSession session) {
     Long userId = Long.valueOf(session.getAttribute("userId").toString());
     LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
@@ -54,7 +56,7 @@ public class ShoppingCartController {
     return R.success(list,"用户购物车列表获取成功");
   }
 //  清空购物车
-  @DeleteMapping
+  @DeleteMapping("/delete/all")
   public R<String> cleanAll(HttpSession session){
     Long userId = Long.valueOf(session.getAttribute("userId").toString());
     LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();

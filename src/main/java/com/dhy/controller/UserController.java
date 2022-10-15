@@ -25,19 +25,20 @@ public class UserController {
   private UserService userService;
 
   @PostMapping("/login")
-  public R<Map> login(@RequestBody Map<String,Object> map, HttpSession session){
-    if (session.getAttribute("code") == null) {
-      return R.error("验证码未发送");
-    }
-    String code = session.getAttribute("code").toString();
-    long time = (long) session.getAttribute("timeOut");
-    if (new Date().getTime() - time > 1000*60*5) {
-      return R.error("验证码过期");
-    }
-    boolean flag = code.equalsIgnoreCase(map.get("code").toString());
-    if (!flag) {
-      return R.error("验证码错误");
-    }
+  public R<Map<String, Object>> login(@RequestBody Map<String,Object> map, HttpSession session){
+//    if (session.getAttribute("code") == null) {
+//      return R.error("验证码未发送");
+//    }
+//    String code = session.getAttribute("code").toString();
+//    long time = (long) session.getAttribute("timeOut");
+//    if (new Date().getTime() - time > 1000*60*5) {
+//      return R.error("验证码过期");
+//    }
+//    boolean flag = code.equalsIgnoreCase(map.get("code").toString());
+//    if (!flag) {
+//      return R.error("验证码错误");
+//    }
+    String code = "xolu5f";
     LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
     queryWrapper.eq(User::getPhone,map.get("phone"));
     User userServiceOne = userService.getOne(queryWrapper);
@@ -48,11 +49,10 @@ public class UserController {
     HashMap<String, Object> info = new HashMap<>();
     jwt.put("phone",userServiceOne.getPhone());
     jwt.put("userId",userServiceOne.getId().toString());
-    Long id = userServiceOne.getId();
+    Long userId = userServiceOne.getId();
     String token = JwtUtils.token(jwt);
-    info.put("token",token);
-    log.info("code={}",code);
-    log.info("map={}",map);
+    info.put("token",token);;
+    info.put("userId",userId);;
     return R.success(info, "登陆成功");
   }
   @PostMapping("/register")

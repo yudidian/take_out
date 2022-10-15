@@ -28,7 +28,8 @@ public class TokenInterceptor implements HandlerInterceptor {
       DecodedJWT info = JwtUtils.getTokenInfo(token);
       String userId = String.valueOf(info.getClaim("userId")).replace("\"", "");
       Long id = Long.valueOf(userId);
-      request.getSession().setAttribute("userId",userId);
+      // 设置用户id
+      request.getSession().setAttribute("userId",id);
       BaseContext.setCurrentId(id);
       return true;
     } catch (SignatureVerificationException e) {
