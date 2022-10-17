@@ -64,10 +64,35 @@ public class ShoppingCartController {
     shoppingCartService.remove(queryWrapper);
     return R.success(null, "清除成功");
   }
-  // 订单数的修改
-  @Update("/change/{id}")
-  public R<String> changeCount(@PathVariable Long id, HttpSession session){
+  // 订单数的数量修改
+  @Update("/less")
+  public R<String> changeCount(@RequestBody ShoppingCart shoppingCart, HttpSession session){
+    LambdaQueryWrapper<ShoppingCart> queryWrapper = getUserIdAndIdentificationId(shoppingCart, session);
+    ShoppingCart shop = shoppingCartService.getOne(queryWrapper);
+    if (shop.getNumber() <= 1) {
+      shoppingCartService.remove(queryWrapper);
+    } else {
+      shop.setNumber(shop.getNumber() - 1);
+      shoppingCartService.save(shop);
+    }
+    return R.success(null, "操作成功");
+  }
+  @DeleteMapping("/delete/one")
+  public R<String> deleteCartList(@RequestBody ShoppingCart shoppingCart, HttpSession session){
+    LambdaQueryWrapper<ShoppingCart> queryWrapper = getUserIdAndIdentificationId(shoppingCart, session);
+    shoppingCartService.remove(queryWrapper);
+    return R.success(null, "操作成功");
+  }
+
+  private LambdaQueryWrapper<ShoppingCart> getUserIdAndIdentificationId(@RequestBody ShoppingCart shoppingCart, HttpSession session) {
     Long userId = Long.valueOf(session.getAttribute("userId").toString());
-    return R.success(null, "success");
+    LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
+    queryWrapper.eq(ShoppingCart::getUserId, userId);
+    if (shoppingCart.getDishId() != null) {
+      queryWrapper.eq(ShoppingCart::getDishId, shoppingCart.getDishId());
+    } else {
+      queryWrapper.eq(ShoppingCart::getSetmealId, shoppingCart.getSetmealId());
+    }
+    return queryWrapper;
   }
 }
