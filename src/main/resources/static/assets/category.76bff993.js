@@ -1,0 +1,1 @@
+import{D as e}from"./index.324fbc67.js";const o=t=>e({url:"/category",method:"GET",params:t}),a=t=>e({url:"/category",method:"post",data:t}),g=t=>e({url:`/category/${t}`,method:"delete"}),s=t=>e({url:"/category",method:"PUT",data:t}),u=()=>e({url:"/category/all",method:"get"});export{a,u as b,g as d,o as g,s as u};

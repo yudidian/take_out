@@ -65,17 +65,18 @@ public class ShoppingCartController {
     return R.success(null, "清除成功");
   }
   // 订单数的数量修改
-  @Update("/less")
-  public R<String> changeCount(@RequestBody ShoppingCart shoppingCart, HttpSession session){
+  @PutMapping("/less")
+  public R<ShoppingCart> changeCount(@RequestBody ShoppingCart shoppingCart, HttpSession session){
     LambdaQueryWrapper<ShoppingCart> queryWrapper = getUserIdAndIdentificationId(shoppingCart, session);
     ShoppingCart shop = shoppingCartService.getOne(queryWrapper);
     if (shop.getNumber() <= 1) {
       shoppingCartService.remove(queryWrapper);
+      return R.success(null, "移出成功");
     } else {
       shop.setNumber(shop.getNumber() - 1);
-      shoppingCartService.save(shop);
+      shoppingCartService.updateById(shop);
+      return R.success(shop, "操作成功");
     }
-    return R.success(null, "操作成功");
   }
   @DeleteMapping("/delete/one")
   public R<String> deleteCartList(@RequestBody ShoppingCart shoppingCart, HttpSession session){
