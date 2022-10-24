@@ -78,7 +78,7 @@ public class ShoppingCartController {
       return R.success(shop, "操作成功");
     }
   }
-  @DeleteMapping("/delete/one")
+  @PutMapping("/delete/one")
   public R<String> deleteCartList(@RequestBody ShoppingCart shoppingCart, HttpSession session){
     LambdaQueryWrapper<ShoppingCart> queryWrapper = getUserIdAndIdentificationId(shoppingCart, session);
     shoppingCartService.remove(queryWrapper);
