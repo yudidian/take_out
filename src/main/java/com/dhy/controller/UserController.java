@@ -60,4 +60,18 @@ public class UserController {
     userService.save(user);
     return R.success(null,"注册成功");
   }
+  @GetMapping
+  private R<User> getUserInfo(HttpSession session) {
+    Long userId = Long.valueOf(session.getAttribute("userId").toString());
+    LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
+    userLambdaQueryWrapper.eq(User::getId, userId);
+    User user = userService.getOne(userLambdaQueryWrapper);
+    return R.success(user,"用户信息获取成功");
+  }
+  // 修改用户信息
+  @PutMapping
+  private R<String> updateUserInfo(@RequestBody User user) {
+    userService.updateById(user);
+    return R.success(null, "修改成功");
+  }
 }

@@ -20,14 +20,14 @@ public class Setmeal implements Serializable {
 
     private Long id;
 
-
     //分类id
     private Long categoryId;
-
 
     //套餐名称
     private String name;
 
+    // 销量
+    private Long salesVolume;
 
     //套餐价格
     private BigDecimal price;

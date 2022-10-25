@@ -1,11 +1,16 @@
 package com.dhy.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dhy.DTO.OrdersDto;
 import com.dhy.common.R;
+import com.dhy.entity.OrderDetail;
 import com.dhy.entity.Orders;
-
-import javax.servlet.http.HttpSession;
+import java.util.List;
 
 public interface OrdersService extends IService<Orders> {
     public R<String> generateOrder(Long addressId, Integer payMethods, String remark, Long userId);
+
+    public R<List<OrderDetail>> getNewOrdersDetail(Long userId);
+
+    public R<List<OrdersDto>> getAllOrdersList(int page, int size, int limit, Long userId);
 }

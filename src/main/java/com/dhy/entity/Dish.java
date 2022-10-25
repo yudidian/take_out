@@ -6,12 +6,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- 菜品
+ * 菜品
  */
 @Data
 public class Dish implements Serializable {
@@ -44,6 +45,8 @@ public class Dish implements Serializable {
     //描述信息
     private String description;
 
+    // 销量
+    private Long salesVolume;
 
     //0 停售 1 起售
     private Integer status;

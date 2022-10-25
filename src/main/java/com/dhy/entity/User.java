@@ -1,5 +1,6 @@
 package com.dhy.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.io.Serializable;
 /**
@@ -26,6 +27,7 @@ public class User implements Serializable {
 
 
     //身份证号
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String idNumber;
 
 
