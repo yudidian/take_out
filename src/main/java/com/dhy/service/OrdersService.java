@@ -13,5 +13,5 @@ public interface OrdersService extends IService<Orders> {
 
     public R<List<OrderDetail>> getNewOrdersDetail(Long userId);
 
-    public R<Page<OrdersDto>> getAllOrdersList(int page, int size, Long userId);
+    public R<Page<OrdersDto>> getAllOrdersList(int page, int size, int state, Long userId);
 }

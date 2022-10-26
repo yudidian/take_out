@@ -106,11 +106,12 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     }
 
     @Override
-    public R<Page<OrdersDto>> getAllOrdersList(int page, int size, Long userId) {
+    public R<Page<OrdersDto>> getAllOrdersList(int page, int size, int state, Long userId) {
         Page<Orders> pageList = new Page<>(page, size);
         Page<OrdersDto> ordersDtoPage = new Page<>();
         LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        ordersLambdaQueryWrapper.eq(Orders::getUserId,userId).orderByDesc(Orders::getOrderTime);
+        // state 如果为0 则查询所有
+        ordersLambdaQueryWrapper.eq(Orders::getUserId,userId).eq(state != 0 , Orders::getStatus, state).orderByDesc(Orders::getOrderTime);
         List<Orders> ordersList = this.page(pageList, ordersLambdaQueryWrapper).getRecords();
         BeanUtils.copyProperties(pageList,ordersDtoPage,"records");
         List<OrdersDto> collect = ordersList.stream().map(item -> {

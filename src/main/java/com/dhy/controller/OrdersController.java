@@ -40,9 +40,9 @@ public class OrdersController {
 
     // 获取订单列表
     @GetMapping("/list")
-    private R<Page<OrdersDto>> getOrdersList(int page, int pageSize, HttpSession session) {
+    private R<Page<OrdersDto>> getOrdersList(int page, int pageSize, int state, HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
-        return ordersService.getAllOrdersList(page, pageSize, userId);
+        return ordersService.getAllOrdersList(page, pageSize, state,userId);
     }
     // 删除某个订单
 
