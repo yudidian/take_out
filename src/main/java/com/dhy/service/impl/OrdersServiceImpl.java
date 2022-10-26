@@ -55,6 +55,8 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         orders.setAddress(addressBook.getProvinceName() + addressBook.getCityName() + addressBook.getDistrictName() + addressBook.getDetail());
         orders.setConsignee(addressBook.getConsignee());
         orders.setUserName(user.getName());
+        // 没有支付功能所有订单全部为待派送
+        orders.setStatus(2);
         // 查询购物车
         List<ShoppingCart> shoppingCartList = shoppingCartService.list(queryWrapperShopping);
         for (ShoppingCart shopp : shoppingCartList) {
@@ -91,6 +93,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Orders::getUserId, userId);
         queryWrapper.orderByDesc(Orders::getOrderTime);
+        queryWrapper.last("limit 1");
         Orders orders = this.getOne(queryWrapper);
         // 获取订单号
         String number = orders.getNumber();
@@ -103,11 +106,13 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     }
 
     @Override
-    public R<List<OrdersDto>> getAllOrdersList(int page, int size, int limit, Long userId) {
-        Page<Orders> pageList = new Page<>(page, size, limit);
+    public R<Page<OrdersDto>> getAllOrdersList(int page, int size, Long userId) {
+        Page<Orders> pageList = new Page<>(page, size);
+        Page<OrdersDto> ordersDtoPage = new Page<>();
         LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
         ordersLambdaQueryWrapper.eq(Orders::getUserId,userId).orderByDesc(Orders::getOrderTime);
         List<Orders> ordersList = this.page(pageList, ordersLambdaQueryWrapper).getRecords();
+        BeanUtils.copyProperties(pageList,ordersDtoPage,"records");
         List<OrdersDto> collect = ordersList.stream().map(item -> {
             OrdersDto ordersDto = new OrdersDto();
             BeanUtils.copyProperties(item, ordersDto);
@@ -117,6 +122,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
             ordersDto.setOrderDetailList(list);
             return ordersDto;
         }).collect(Collectors.toList());
-        return R.success(collect,"订单列表获取成功");
+        ordersDtoPage.setRecords(collect);
+        return R.success(ordersDtoPage,"订单列表获取成功");
     }
 }

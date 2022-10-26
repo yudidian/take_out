@@ -1,5 +1,6 @@
 package com.dhy.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dhy.DTO.OrdersDto;
 import com.dhy.common.R;
@@ -12,5 +13,5 @@ public interface OrdersService extends IService<Orders> {
 
     public R<List<OrderDetail>> getNewOrdersDetail(Long userId);
 
-    public R<List<OrdersDto>> getAllOrdersList(int page, int size, int limit, Long userId);
+    public R<Page<OrdersDto>> getAllOrdersList(int page, int size, Long userId);
 }
