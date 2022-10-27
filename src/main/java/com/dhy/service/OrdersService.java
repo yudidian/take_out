@@ -14,4 +14,7 @@ public interface OrdersService extends IService<Orders> {
     public R<List<OrderDetail>> getNewOrdersDetail(Long userId);
 
     public R<Page<OrdersDto>> getAllOrdersList(int page, int size, int state, Long userId);
+
+    // 取消或者确认收货
+    public R<String> confirmOrCancelOrders(Boolean flag, String number);
 }

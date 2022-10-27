@@ -1,6 +1,7 @@
 package com.dhy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dhy.DTO.OrdersDto;
@@ -110,10 +111,17 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         Page<Orders> pageList = new Page<>(page, size);
         Page<OrdersDto> ordersDtoPage = new Page<>();
         LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        // state 如果为0 则查询所有
-        ordersLambdaQueryWrapper.eq(Orders::getUserId,userId).eq(state != 0 , Orders::getStatus, state).orderByDesc(Orders::getOrderTime);
+        // state 1待付款，2待派送，3已派送，4已完成
+        ordersLambdaQueryWrapper.eq(Orders::getUserId, userId).orderByDesc(Orders::getOrderTime);
+        if (state == 4) {
+            // 查询历史订单（已完成）
+            ordersLambdaQueryWrapper.eq(Orders::getStatus, state);
+        } else {
+            // 查询待派送，已派送订单
+            ordersLambdaQueryWrapper.ne(Orders::getStatus, 4);
+        }
         List<Orders> ordersList = this.page(pageList, ordersLambdaQueryWrapper).getRecords();
-        BeanUtils.copyProperties(pageList,ordersDtoPage,"records");
+        BeanUtils.copyProperties(pageList, ordersDtoPage, "records");
         List<OrdersDto> collect = ordersList.stream().map(item -> {
             OrdersDto ordersDto = new OrdersDto();
             BeanUtils.copyProperties(item, ordersDto);
@@ -124,6 +132,27 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
             return ordersDto;
         }).collect(Collectors.toList());
         ordersDtoPage.setRecords(collect);
-        return R.success(ordersDtoPage,"订单列表获取成功");
+        return R.success(ordersDtoPage, "订单列表获取成功");
+    }
+
+    @Override
+    public R<String> confirmOrCancelOrders(Boolean flag, String number) {
+        // 确认收货
+        if (flag) {
+            LambdaUpdateWrapper<Orders> ordersLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+            ordersLambdaUpdateWrapper.set(Orders::getStatus, 4);
+            this.update(ordersLambdaUpdateWrapper);
+            return R.success(null, "确认收货完成");
+        } else {
+            // 取消订单
+            LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            ordersLambdaQueryWrapper.eq(Orders::getNumber, number);
+            this.remove(ordersLambdaQueryWrapper);
+            // 移除订单详情
+            LambdaQueryWrapper<OrderDetail> orderDetailLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            orderDetailLambdaQueryWrapper.eq(OrderDetail::getOrderId, number);
+            orderDetailService.remove(orderDetailLambdaQueryWrapper);
+            return R.success(null, "取消订单成功");
+        }
     }
 }
