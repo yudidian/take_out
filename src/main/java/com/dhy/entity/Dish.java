@@ -48,6 +48,10 @@ public class Dish implements Serializable {
     // 销量
     private Long salesVolume;
 
+
+    // 销量
+    private int reviewCount;
+
     //0 停售 1 起售
     private Integer status;
 

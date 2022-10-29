@@ -28,7 +28,8 @@ public class Setmeal implements Serializable {
 
     // 销量
     private Long salesVolume;
-
+    // 销量
+    private int reviewCount;
     //套餐价格
     private BigDecimal price;
 
