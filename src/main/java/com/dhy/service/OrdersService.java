@@ -17,4 +17,7 @@ public interface OrdersService extends IService<Orders> {
 
     // 取消或者确认收货
     public R<String> confirmOrCancelOrders(Boolean flag, String number);
+
+    // 管理页面获取订单信息
+    public R<Page<OrdersDto>> manageGetAllOrdersList(int page, int size, int state);
 }

@@ -32,6 +32,11 @@ public class Orders implements Serializable {
     //下单时间
     private LocalDateTime orderTime;
 
+    // 用户收货时间
+    private LocalDateTime orderCompleteTime;
+
+    // 商家出餐时间
+    private LocalDateTime dinnerOutTime;
 
     //结账时间
     private LocalDateTime checkoutTime;

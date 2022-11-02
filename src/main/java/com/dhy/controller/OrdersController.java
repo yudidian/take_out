@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,18 +46,20 @@ public class OrdersController {
     @GetMapping("/list")
     private R<Page<OrdersDto>> getOrdersList(int page, int pageSize, int state, HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
-        return ordersService.getAllOrdersList(page, pageSize, state,userId);
+        return ordersService.getAllOrdersList(page, pageSize, state, userId);
     }
+
     @GetMapping("/unfinished")
     private R<Map<String, Object>> getUnfinishedOrders(HttpSession session) {
         HashMap<String, Object> hashMap = new HashMap<>();
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
-        LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper =new LambdaQueryWrapper<>();
-        ordersLambdaQueryWrapper.eq(Orders::getUserId,userId).eq(Orders::getStatus,2);
+        LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        ordersLambdaQueryWrapper.eq(Orders::getUserId, userId).eq(Orders::getStatus, 2);
         List<Orders> list = ordersService.list(ordersLambdaQueryWrapper);
         hashMap.put("size", list.size());
-        return R.SuccessPlus(hashMap,"待收货数量获取成功");
+        return R.SuccessPlus(hashMap, "待收货数量获取成功");
     }
+
     // 删除某个订单
     @DeleteMapping("/{id}")
     private R<String> deleteOneOrders(@PathVariable String id) {
@@ -68,27 +71,39 @@ public class OrdersController {
         orderDetailService.remove(orderDetailLambdaQueryWrapper);
         return R.success(null, "订单删除成功");
     }
+
     // 确认或取消订单
     @GetMapping("/confirmOrCancel")
     private R<String> confirmOrCancelOrders(String ordersId, Boolean flag) {
-        return ordersService.confirmOrCancelOrders(flag,ordersId);
+        return ordersService.confirmOrCancelOrders(flag, ordersId);
     }
+
     // 获取订单状态  1待付款，2待派送，3已派送，4已完成
     @GetMapping("/state")
-    private R<Map<String,Object>> getOrders(String number, int flag) {
+    private R<Map<String, Object>> getOrders(String number, int flag) {
         // 0 获取当前订单状态， 1 卖家发货
         HashMap<String, Object> hashMap = new HashMap<>();
         if (flag == 0) {
             LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            ordersLambdaQueryWrapper.eq(Orders::getNumber,number);
+            ordersLambdaQueryWrapper.eq(Orders::getNumber, number);
             Orders orders = ordersService.getOne(ordersLambdaQueryWrapper);
             hashMap.put("state", orders.getStatus());
+            hashMap.put("orderTime", orders.getOrderTime());
+            hashMap.put("dinnerOutTime", orders.getDinnerOutTime());
+            hashMap.put("orderCompleteTime", orders.getOrderCompleteTime());
             return R.SuccessPlus(hashMap, "当前订单状态获取成功");
         } else {
             LambdaUpdateWrapper<Orders> ordersLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-            ordersLambdaUpdateWrapper.eq(Orders::getNumber,number).set(Orders::getStatus,3);
+            ordersLambdaUpdateWrapper.eq(Orders::getNumber, number)
+                    .set(Orders::getStatus, 3)
+                    .set(Orders::getDinnerOutTime, LocalDateTime.now());
             ordersService.update(ordersLambdaUpdateWrapper);
             return R.SuccessPlus(hashMap, "已发货");
         }
+    }
+
+    @GetMapping("/manage/list")
+    private R<Page<OrdersDto>> manageGetAllOrdersList(int page, int pageSize, int state) {
+        return ordersService.manageGetAllOrdersList(page, pageSize, state);
     }
 }
