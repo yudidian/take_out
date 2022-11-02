@@ -10,6 +10,9 @@ import com.dhy.entity.Setmeal;
 import com.dhy.service.SetmealDishService;
 import com.dhy.service.SetmealService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +26,7 @@ public class SetmealController {
 
   // 添加套餐
   @PostMapping
+  @CacheEvict(value = "setMeal", key = "#setmealDto.id")
   public R<String> addSetmeal(@RequestBody SetmealDto setmealDto) {
     setmealService.saveSetmealAndSetmealDish(setmealDto);
     return R.success(null, "套餐添加成功");
@@ -37,6 +41,7 @@ public class SetmealController {
 
   // 修改套餐
   @PutMapping
+  @CacheEvict(value = "setMeal", key = "#setmealDto.id")
   public R<String> updateMeal(@RequestBody SetmealDto setmealDto) {
     setmealService.updateSetmealAndSetmealDish(setmealDto);
     return R.success(null, "修改成功");
@@ -44,6 +49,7 @@ public class SetmealController {
 
   // 根据id获取对应套餐信息
   @GetMapping("/{id}")
+  @Cacheable(value = "setMeal", key = "#id")
   public R<SetmealDto> getMealById(@PathVariable Long id) {
     SetmealDto setmealDto = setmealService.getMealById(id);
     return R.success(setmealDto, "对应信息获取成功");
@@ -65,6 +71,7 @@ public class SetmealController {
   }
 
   @GetMapping("/list")
+  @Cacheable(value = "setMealList", key = "#setmeal.categoryId + '1'")
   public R<List<Setmeal>> getSetmealList(Setmeal setmeal) {
     LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
     lambdaQueryWrapper.eq(setmeal.getCategoryId() != null, Setmeal::getCategoryId, setmeal.getCategoryId());

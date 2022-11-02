@@ -13,6 +13,8 @@ import com.dhy.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,7 @@ public class DishController {
 
   // 添加菜品
   @PostMapping
+  @CacheEvict(value = "dish", key = "#dishDto.categoryId + '1'")
   public R<String> addDish(@RequestBody DishDto dishDto) {
     dishService.saveDish(dishDto);
     return R.success(null, "添加成功");
@@ -69,6 +72,7 @@ public class DishController {
 
   // 根据id 获取添加页面初始信息
   @GetMapping("/{id}")
+  @Cacheable(value = "dish", key = "#id + '1'")
   public R<DishDto> getById(@PathVariable Long id) {
     DishDto dishDto = dishService.getByIdWithFlavor(id);
     return R.success(dishDto, "获取成功");
@@ -76,6 +80,7 @@ public class DishController {
 
   //  修改商品信息以及口味表
   @PutMapping
+  @CacheEvict(value = "dish", key = "#dishDto.categoryId + '1'")
   public R<String> updateAndFlavor(@RequestBody DishDto dishDto) {
     dishService.updateAndFlavor(dishDto);
     return R.success(null, "修改成功");
@@ -83,6 +88,7 @@ public class DishController {
 
   // 批量修改商品
   @PutMapping("/all")
+  @CacheEvict(value = "dish", key = "#dishDto.categoryId + '1'")
   public R<String> updateAllById(@RequestBody DishDto dishDto) {
     List<String> allId = dishDto.getAllId();
     List<Long> collect = allId.stream().map(Long::valueOf).collect(Collectors.toList());
@@ -91,6 +97,7 @@ public class DishController {
   }
   // 根据id修改商品状态(删除或销售状态)
   @PutMapping("/status")
+  @CacheEvict(value = "dish", key = "#dishDto.categoryId + '1'")
   public R<String> updateStatus(@RequestBody DishDto dishDto) {
     boolean flag = dishService.updateById(dishDto);
     if (flag){
@@ -99,8 +106,9 @@ public class DishController {
       return R.error("修改商品状态失败");
     }
   }
-  // 根据菜品分类获取旗下对应的菜品
+  // 根据菜品分类获取旗下对应的菜品 (开启缓存)
   @GetMapping("/list")
+  @Cacheable(value = "dish", key = "#dishDto.categoryId + '1'")
   public R<List<DishDto>> listDish(DishDto dishDto){
     Long categoryId = dishDto.getCategoryId();
     LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
