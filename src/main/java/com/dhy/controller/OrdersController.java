@@ -92,7 +92,7 @@ public class OrdersController {
         }
     }
     // 获取新订单
-    @GetMapping()
+    @GetMapping("/new/count")
     private R<Integer> getNewsOrder() {
         LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
         ordersLambdaQueryWrapper.eq(Orders::getStatus, 2);

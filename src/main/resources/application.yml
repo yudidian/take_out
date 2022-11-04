@@ -16,7 +16,7 @@ spring:
     check-template: true
     cache: true
     suffix: .html
-    mode: HTML5
+    mode: HTML
     encoding: utf-8
   mail:
     host: smtp.qq.com
@@ -54,5 +54,5 @@ mybatis-plus:
       id-type: ASSIGN_ID
 
 kola:
-  path: E:\kola_image
+  path: E:/kola_image/
 #  path: /www/wwwroot/image/
