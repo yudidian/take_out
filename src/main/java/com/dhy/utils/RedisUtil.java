@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisUtil {
 
-    @Resource
+    @Autowired
     private RedisTemplate redisTemplate;
     /**
      * 给一个指定的 key 值附加过期时间

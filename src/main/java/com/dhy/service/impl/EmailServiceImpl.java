@@ -38,7 +38,7 @@ public class EmailServiceImpl implements EmailService {
       //设置传入模板的页面的参数 参数名为:id 参数随便写一个就行
       context.setVariable("message", content);
       //emailTemplate是你要发送的模板我这里用的是Thymeleaf
-      String process = templateEngine.process("email", context);
+      String process = templateEngine.process("email/email.html", context);
       //邮件内容，html格式
       messageHelper.setText(process, true);
       //发送
