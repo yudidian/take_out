@@ -91,4 +91,12 @@ public class OrdersController {
             return R.SuccessPlus(hashMap, "已发货");
         }
     }
+    // 获取新订单
+    @GetMapping()
+    private R<Integer> getNewsOrder() {
+        LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        ordersLambdaQueryWrapper.eq(Orders::getStatus, 2);
+        int count = ordersService.count(ordersLambdaQueryWrapper);
+        return R.success(count, "获取成功");
+    }
 }

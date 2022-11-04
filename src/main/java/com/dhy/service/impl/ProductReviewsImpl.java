@@ -26,18 +26,17 @@ public class ProductReviewsImpl extends ServiceImpl<ProductReviewsMapper, Produc
     public R<Page<ProductReviewsDto>> getReviewsList(Long dishId, Long setmealId, int reta, Long userId, int page, int pageSize) {
         Page<ProductReviews> productReviewsPage = new Page<>(page, pageSize);
         Page<ProductReviewsDto> productReviewsDtoPage = new Page<>();
-        User user = userService.getById(userId);
         LambdaQueryWrapper<ProductReviews> productReviewsLambdaQueryWrapper = new LambdaQueryWrapper<>();
         productReviewsLambdaQueryWrapper.eq(dishId != null, ProductReviews::getDishId, dishId)
                 .eq(setmealId != null, ProductReviews::getSetmealId, setmealId)
-                .eq(reta != 0 && reta != -1, ProductReviews::getRating, reta)
-                .eq(ProductReviews::getUserId, userId);
+                .eq(reta != 0 && reta != -1, ProductReviews::getRating, reta);
         if (reta == -1) {
             productReviewsLambdaQueryWrapper.orderByDesc(ProductReviews::getCreateTime);
         }
         this.page(productReviewsPage, productReviewsLambdaQueryWrapper);
         BeanUtils.copyProperties(productReviewsPage, productReviewsDtoPage, "records");
         List<ProductReviewsDto> collect = productReviewsPage.getRecords().stream().map(item -> {
+            User user = userService.getById(item.getUserId());
             ProductReviewsDto productReviewsDto = new ProductReviewsDto();
             BeanUtils.copyProperties(item, productReviewsDto);
             productReviewsDto.setImages(item.getImage().split(","));
