@@ -72,7 +72,8 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
                 Dish dish = dishService.getById(shopp.getDishId());
                 dish.setSalesVolume(shopp.getNumber() + dish.getSalesVolume());
                 dishService.updateById(dish);
-            } else {
+            }
+            if(shopp.getSetmealId() != null) {
                 Setmeal setmeal = setmealService.getById(shopp.getSetmealId());
                 setmeal.setSalesVolume(shopp.getNumber() + setmeal.getSalesVolume());
                 setmealService.updateById(setmeal);

@@ -38,11 +38,9 @@ public class FavoritesListController {
     }
 
     @GetMapping("/{id}")
-    private R<String> addFavorites(@PathVariable Long id, HttpSession session) {
-        Long userId = Long.valueOf(session.getAttribute("userId").toString());
+    private R<String> addFavorites(@PathVariable Long id) {
         LambdaQueryWrapper<FavoritesList> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(FavoritesList::getDishId, id);
-        queryWrapper.eq(FavoritesList::getUserId, userId);
         FavoritesList list = favoritesListService.getOne(queryWrapper);
         Map<String,Object> map = new HashMap<>();
         if (list != null) {
