@@ -97,6 +97,9 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         queryWrapper.orderByDesc(Orders::getOrderTime);
         queryWrapper.last("limit 1");
         Orders orders = this.getOne(queryWrapper);
+        if (orders == null) {
+            return R.success(null, "暂无订单");
+        }
         // 获取订单号
         String number = orders.getNumber();
         // 根据订单号查询商品

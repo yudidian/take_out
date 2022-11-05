@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -30,6 +31,10 @@ public class AddressBookController {
         int count = addressBookService.count(queryWrapper);
         if (count > 10) {
             throw new CustomException("每个用户最多设置10个地址");
+        }
+        // 用户添加第一数据时默认设置为默认地址
+        if (count == 0) {
+            addressBook.setIsDefault(1);
         }
         boolean save = addressBookService.save(addressBook);
         if (save) {
@@ -74,6 +79,9 @@ public class AddressBookController {
         queryWrapper.eq(AddressBook::getUserId, userId);
         queryWrapper.eq(AddressBook::getIsDefault, 1);
         AddressBook addressBook = addressBookService.getOne(queryWrapper);
+        if (addressBook == null) {
+            return R.success(null, "默认地址为空");
+        }
         return R.success(addressBook, "默认地址获取成功");
     }
 
