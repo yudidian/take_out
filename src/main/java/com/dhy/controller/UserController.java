@@ -39,6 +39,9 @@ public class UserController {
         if (!map.get("code").toString().equals("deng11")) {
             String code = (String) redisUtil.get(map.get("phone").toString());
             if (code == null) {
+                return R.error("未获取验证码");
+            }
+            if (map.get("code") == null) {
                 return R.error("验证码为空");
             }
             boolean flag = code.equalsIgnoreCase(map.get("code").toString());

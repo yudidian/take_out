@@ -9,6 +9,9 @@ import com.dhy.entity.OrderDetail;
 import com.dhy.entity.Orders;
 import com.dhy.service.OrderDetailService;
 import com.dhy.service.OrdersService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -98,5 +101,15 @@ public class OrdersController {
         ordersLambdaQueryWrapper.eq(Orders::getStatus, 2);
         int count = ordersService.count(ordersLambdaQueryWrapper);
         return R.success(count, "获取成功");
+    }
+    @GetMapping("/manage/list")
+    @ApiOperation(value = "管理页面获取订单列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "当前页", name="page", required = true),
+            @ApiImplicitParam(value = "每页数量", name="pageSize", required = true),
+            @ApiImplicitParam(value = "订单的状态", name="state", required = true)
+    })
+    private R<Page<OrdersDto>> manageGetAllOrdersList(int page, int pageSize, int state) {
+        return ordersService.manageGetAllOrdersList(page, pageSize, state);
     }
 }

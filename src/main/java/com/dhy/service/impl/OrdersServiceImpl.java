@@ -159,4 +159,29 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
             return R.success(null, "取消订单成功");
         }
     }
+    @Override
+    public R<Page<OrdersDto>> manageGetAllOrdersList(int page, int size, int state) {
+        Page<Orders> pageList = new Page<>(page, size);
+        Page<OrdersDto> ordersDtoPage = new Page<>();
+        LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        // state 1待付款，2待派送，3已派送，4已完成
+        ordersLambdaQueryWrapper.orderByDesc(Orders::getOrderTime);
+        if (state != 0) {
+            // 查询历史订单（已完成）
+            ordersLambdaQueryWrapper.eq(Orders::getStatus, state);
+        }
+        List<Orders> ordersList = this.page(pageList, ordersLambdaQueryWrapper).getRecords();
+        BeanUtils.copyProperties(pageList, ordersDtoPage, "records");
+        List<OrdersDto> collect = ordersList.stream().map(item -> {
+            OrdersDto ordersDto = new OrdersDto();
+            BeanUtils.copyProperties(item, ordersDto);
+            LambdaQueryWrapper<OrderDetail> orderDetailLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            orderDetailLambdaQueryWrapper.eq(OrderDetail::getOrderId, item.getNumber());
+            List<OrderDetail> list = orderDetailService.list(orderDetailLambdaQueryWrapper);
+            ordersDto.setOrderDetailList(list);
+            return ordersDto;
+        }).collect(Collectors.toList());
+        ordersDtoPage.setRecords(collect);
+        return R.success(ordersDtoPage, "订单列表获取成功");
+    }
 }
