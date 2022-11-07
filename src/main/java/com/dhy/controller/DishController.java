@@ -10,9 +10,16 @@ import com.dhy.entity.DishFlavor;
 import com.dhy.service.CategoryService;
 import com.dhy.service.DishFlavorService;
 import com.dhy.service.DishService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +30,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/dish")
 @ResponseBody
 @Slf4j
+@Api(tags = "菜品相关操作")
 public class DishController {
 
   @Autowired
@@ -35,6 +43,8 @@ public class DishController {
 
   // 添加菜品
   @PostMapping
+  @CacheEvict(cacheNames = "dishList", key = "#dishDto.categoryId")
+  @ApiOperation(value = "添加菜品")
   public R<String> addDish(@RequestBody DishDto dishDto) {
     dishService.saveDish(dishDto);
     return R.success(null, "添加成功");
@@ -42,6 +52,12 @@ public class DishController {
 
   // 分页查询
   @GetMapping("/page")
+  @ApiOperation(value = "菜品分页查询")
+  @ApiImplicitParams({
+          @ApiImplicitParam(value = "当前页", name="page", dataType = "String", paramType = "query", required = true),
+          @ApiImplicitParam(value = "每页数量", name="pageSize", dataType = "String", paramType = "query", required = true),
+          @ApiImplicitParam(value = "搜索的菜品名称", name="name", dataType = "String", paramType = "query", required = false)
+  })
   public R<Page> getPage(int page, int pageSize, String name) {
     Page<Dish> pageInfo = new Page<>(page, pageSize);
     Page<DishDto> dishDtoPage = new Page<>();
@@ -69,6 +85,9 @@ public class DishController {
 
   // 根据id 获取添加页面初始信息
   @GetMapping("/{id}")
+  @Cacheable(cacheNames = "dishDetail", key = "#id")
+  @ApiOperation(value = "根据id 获取添加页面初始信息")
+  @ApiImplicitParam(value = "菜品ID", name="id", dataType = "String", required = true)
   public R<DishDto> getById(@PathVariable Long id) {
     DishDto dishDto = dishService.getByIdWithFlavor(id);
     return R.success(dishDto, "获取成功");
@@ -76,6 +95,11 @@ public class DishController {
 
   //  修改商品信息以及口味表
   @PutMapping
+  @Caching(evict = {
+          @CacheEvict(cacheNames = "dishDetail", key = "#dishDto.id"),
+          @CacheEvict(cacheNames = "dishList", key = "#dishDto.categoryId")
+  })
+  @ApiOperation(value = "修改商品信息以及口味表")
   public R<String> updateAndFlavor(@RequestBody DishDto dishDto) {
     dishService.updateAndFlavor(dishDto);
     return R.success(null, "修改成功");
@@ -83,6 +107,11 @@ public class DishController {
 
   // 批量修改商品
   @PutMapping("/all")
+  @Caching(evict = {
+          @CacheEvict(cacheNames = "dishDetail", allEntries = true),
+          @CacheEvict(cacheNames = "dishList", allEntries = true)
+  })
+  @ApiOperation(value = "批量修改商品")
   public R<String> updateAllById(@RequestBody DishDto dishDto) {
     List<String> allId = dishDto.getAllId();
     List<Long> collect = allId.stream().map(Long::valueOf).collect(Collectors.toList());
@@ -91,6 +120,11 @@ public class DishController {
   }
   // 根据id修改商品状态(删除或销售状态)
   @PutMapping("/status")
+  @Caching(evict = {
+          @CacheEvict(cacheNames = "dishDetail", key = "#dishDto.id"),
+          @CacheEvict(cacheNames = "dishList", key = "#dishDto.categoryId")
+  })
+  @ApiOperation(value = "根据id修改商品状态(删除或销售状态)")
   public R<String> updateStatus(@RequestBody DishDto dishDto) {
     boolean flag = dishService.updateById(dishDto);
     if (flag){
@@ -101,6 +135,8 @@ public class DishController {
   }
   // 根据菜品分类获取旗下对应的菜品
   @GetMapping("/list")
+  @ApiOperation(value = "根据菜品分类获取旗下对应的菜品")
+  @Cacheable(cacheNames = "dishList", key = "#dishDto.categoryId")
   public R<List<DishDto>> listDish(DishDto dishDto){
     Long categoryId = dishDto.getCategoryId();
     LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();

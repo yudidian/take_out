@@ -39,22 +39,22 @@ spring:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
       url: jdbc:mysql://localhost:3306/take_out?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
-      username: take_out
-      password: root
-#      username: root
-#      password: admin
+#      username: take_out
+#      password: root
+      username: root
+      password: admin
   web:
     resources:
       static-locations: classpath:/static/
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-#    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       id-type: ASSIGN_ID
 
 kola:
-#  path: E:/kola_image/
-  path: /www/wwwroot/image/
+  path: E:/kola_image/
+#  path: /www/wwwroot/image/
