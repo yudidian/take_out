@@ -1,6 +1,7 @@
 package com.dhy.config;
 
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
+import com.dhy.common.R;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +32,7 @@ public class RedisConfig{
         redisTemplate.setStringSerializer(stringGenericToStringSerializer);
 
         // 使用FastJsonRedisSerializer来序列化和反序列化redis的值
-        FastJsonRedisSerializer<Object> fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
+        FastJsonRedisSerializer<R> fastJsonRedisSerializer = new FastJsonRedisSerializer<>(R.class);
         redisTemplate.setValueSerializer(fastJsonRedisSerializer);
         redisTemplate.setHashValueSerializer(fastJsonRedisSerializer);
 
