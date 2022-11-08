@@ -58,3 +58,4 @@ mybatis-plus:
 kola:
 #  path: E:/kola_image/
   path: /www/wwwroot/image/
+  message: test
