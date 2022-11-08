@@ -31,6 +31,8 @@ public class ValidateCodeUtil {
         String code = (String) redisUtil.get(email);
         char[] nonceChars = new char[6];
         // 验证码为空说明要么没有获取要么失效
+        redisUtil.get(("sendCount" + email));
+        redisUtil.get("sendCount"+email);
         int sendCount = redisUtil.get("sendCount" + email) == null ? 0 : Integer.parseInt(String.valueOf(redisUtil.get("sendCount"+email)));
         // 每天获取三次验证码
         if (sendCount < 4) {

@@ -13,6 +13,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig{
@@ -23,19 +24,8 @@ public class RedisConfig{
     @Primary
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setConnectionFactory(factory);
-
-        // 使用GenericToStringSerializer来序列化和反序列化redis的key
-        GenericToStringSerializer<String> stringGenericToStringSerializer = new GenericToStringSerializer<>(String.class);
-        redisTemplate.setKeySerializer(stringGenericToStringSerializer);
-        redisTemplate.setHashKeySerializer(stringGenericToStringSerializer);
-        redisTemplate.setStringSerializer(stringGenericToStringSerializer);
-
-        // 使用FastJsonRedisSerializer来序列化和反序列化redis的值
-        FastJsonRedisSerializer<R> fastJsonRedisSerializer = new FastJsonRedisSerializer<>(R.class);
-        redisTemplate.setValueSerializer(fastJsonRedisSerializer);
-        redisTemplate.setHashValueSerializer(fastJsonRedisSerializer);
-
         return redisTemplate;
     }
 
