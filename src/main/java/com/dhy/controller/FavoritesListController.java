@@ -1,6 +1,7 @@
 package com.dhy.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dhy.DTO.FavoritesListDto;
 import com.dhy.common.R;
 import com.dhy.entity.Dish;
@@ -13,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/favorites")
 @ResponseBody
-@Api(value = "收藏列表相关接口")
+@Api(tags = "收藏列表相关接口")
 public class FavoritesListController {
     @Autowired
     private FavoritesListService favoritesListService;
@@ -39,8 +41,8 @@ public class FavoritesListController {
     @GetMapping("/change")
     @ApiOperation(value = "收藏或取消")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "菜品或套餐ID", name = "id"),
-            @ApiImplicitParam(value = "套餐或者菜品标识", name = "type")
+            @ApiImplicitParam(value = "菜品或套餐ID", name = "id", dataType = "Long", required = true, paramType = "query"),
+            @ApiImplicitParam(value = "套餐或者菜品标识", name = "type", dataType = "String", required = true, paramType = "query")
     })
     private R<String> addFavorites(@RequestParam Map<String, Object> map, HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
@@ -68,8 +70,8 @@ public class FavoritesListController {
     @GetMapping("/{id}/{type}")
     @ApiOperation(value = "查看对应用户的菜品是否有收藏")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "菜品或者套餐ID", required = true),
-            @ApiImplicitParam(name = "type", value = "菜品或者套餐标识1菜品2套餐", required = true)
+            @ApiImplicitParam(name = "id", value = "菜品或者套餐ID", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "type", value = "菜品或者套餐标识1菜品2套餐", required = true, paramType = "query")
     })
     private R<String> getFavoritesType(@PathVariable Long id, @PathVariable String type, HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
@@ -92,12 +94,25 @@ public class FavoritesListController {
 
     @GetMapping("/list")
     @ApiOperation(value = "获取用户收藏列表")
-    private R<List<FavoritesListDto>> getFavoritesList(HttpSession session) {
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="page", value = "当前页", dataType = "int", required = true, paramType = "query"),
+            @ApiImplicitParam(name="pageSize", value = "每页数量", dataType = "int", required = true, paramType = "query")
+    })
+    private R<Page<FavoritesListDto>> getFavoritesList(int page, int pageSize,HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
+
+        Page<FavoritesList> favoritesListPage = new Page<>(page,pageSize);
+        Page<FavoritesListDto> favoritesListDtoPage = new Page<>();
+
         LambdaQueryWrapper<FavoritesList> favoritesListLambdaQueryWrapper = new LambdaQueryWrapper<>();
         favoritesListLambdaQueryWrapper.eq(FavoritesList::getUserId, userId);
-        List<FavoritesList> list = favoritesListService.list(favoritesListLambdaQueryWrapper);
-        List<FavoritesListDto> collect = list.stream().map(item -> {
+        favoritesListService.page(favoritesListPage,favoritesListLambdaQueryWrapper);
+
+
+        BeanUtils.copyProperties(favoritesListPage, favoritesListDtoPage, "records");
+
+
+        List<FavoritesListDto> collect = favoritesListPage.getRecords().stream().map(item -> {
             FavoritesListDto favoritesListDto = new FavoritesListDto();
             if (item.getDishId() != null) {
                 Dish dish = dishService.getById(item.getDishId());
@@ -114,6 +129,7 @@ public class FavoritesListController {
             }
             return favoritesListDto;
         }).collect(Collectors.toList());
-        return R.success(collect, "用户收藏列表获取成功");
+        favoritesListDtoPage.setRecords(collect);
+        return R.success(favoritesListDtoPage, "用户收藏列表获取成功");
     }
 }

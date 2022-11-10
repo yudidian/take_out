@@ -54,8 +54,8 @@ public class DishController {
   @GetMapping("/page")
   @ApiOperation(value = "菜品分页查询")
   @ApiImplicitParams({
-          @ApiImplicitParam(value = "当前页", name="page", dataType = "String", paramType = "query", required = true),
-          @ApiImplicitParam(value = "每页数量", name="pageSize", dataType = "String", paramType = "query", required = true),
+          @ApiImplicitParam(value = "当前页", name="page", dataType = "int", paramType = "query", required = true),
+          @ApiImplicitParam(value = "每页数量", name="pageSize", dataType = "int", paramType = "query", required = true),
           @ApiImplicitParam(value = "搜索的菜品名称", name="name", dataType = "String", paramType = "query", required = false)
   })
   public R<Page> getPage(int page, int pageSize, String name) {
