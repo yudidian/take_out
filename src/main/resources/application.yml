@@ -11,6 +11,7 @@ spring:
         max-wait: 1ms #连接池最大阻塞等待时间
         max-idle: 4 #连接池中的最大空闲连接
         min-idle: 0 #连接池中最小空闲连接
+#    password: root
   thymeleaf:
     prefix: classpath:/templates/
     check-template: true
@@ -39,10 +40,10 @@ spring:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
       url: jdbc:mysql://localhost:3306/take_out?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
-      username: take_out
-      password: root
-#      username: root
-#      password: admin
+#      username: take_out
+#      password: root
+      username: root
+      password: admin
   web:
     resources:
       static-locations: classpath:/static/
@@ -56,5 +57,5 @@ mybatis-plus:
       id-type: ASSIGN_ID
 
 kola:
-#  path: E:/kola_image/
-  path: /www/wwwroot/image/
+  path: E:/kola_image/
+#  path: /www/wwwroot/image/
