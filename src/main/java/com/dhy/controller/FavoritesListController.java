@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
@@ -44,7 +45,7 @@ public class FavoritesListController {
             @ApiImplicitParam(value = "菜品或套餐ID", name = "id", dataType = "String", required = true, paramType = "query", dataTypeClass = String.class),
             @ApiImplicitParam(value = "套餐或者菜品标识", name = "type", dataType = "String", required = true, paramType = "query", dataTypeClass = String.class)
     })
-    private R<String> addFavorites(@RequestParam Map<String, Object> map, HttpSession session) {
+    private R<String> addFavorites(@ApiIgnore @RequestParam Map<String, Object> map, @ApiIgnore HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
         FavoritesList favoritesList = new FavoritesList();
         favoritesList.setUserId(userId);
@@ -73,7 +74,7 @@ public class FavoritesListController {
             @ApiImplicitParam(name = "id", value = "菜品或者套餐ID", dataType = "String", required = true, paramType = "query", dataTypeClass = String.class),
             @ApiImplicitParam(name = "type", value = "菜品或者套餐标识1菜品2套餐", required = true, paramType = "query", dataTypeClass = String.class)
     })
-    private R<String> getFavoritesType(@PathVariable Long id, @PathVariable String type, HttpSession session) {
+    private R<String> getFavoritesType(@PathVariable Long id, @PathVariable String type, @ApiIgnore HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
         LambdaQueryWrapper<FavoritesList> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(FavoritesList::getUserId, userId);
@@ -95,18 +96,18 @@ public class FavoritesListController {
     @GetMapping("/list")
     @ApiOperation(value = "获取用户收藏列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="page", value = "当前页", dataType = "int", required = true, paramType = "query", dataTypeClass = int.class),
-            @ApiImplicitParam(name="pageSize", value = "每页数量", dataType = "int", required = true, paramType = "query", dataTypeClass = int.class)
+            @ApiImplicitParam(name = "page", value = "当前页", dataType = "int", required = true, paramType = "query", dataTypeClass = int.class),
+            @ApiImplicitParam(name = "pageSize", value = "每页数量", dataType = "int", required = true, paramType = "query", dataTypeClass = int.class)
     })
-    private R<Page<FavoritesListDto>> getFavoritesList(int page, int pageSize,HttpSession session) {
+    private R<Page<FavoritesListDto>> getFavoritesList(int page, int pageSize,@ApiIgnore HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
 
-        Page<FavoritesList> favoritesListPage = new Page<>(page,pageSize);
+        Page<FavoritesList> favoritesListPage = new Page<>(page, pageSize);
         Page<FavoritesListDto> favoritesListDtoPage = new Page<>();
 
         LambdaQueryWrapper<FavoritesList> favoritesListLambdaQueryWrapper = new LambdaQueryWrapper<>();
         favoritesListLambdaQueryWrapper.eq(FavoritesList::getUserId, userId);
-        favoritesListService.page(favoritesListPage,favoritesListLambdaQueryWrapper);
+        favoritesListService.page(favoritesListPage, favoritesListLambdaQueryWrapper);
 
 
         BeanUtils.copyProperties(favoritesListPage, favoritesListDtoPage, "records");

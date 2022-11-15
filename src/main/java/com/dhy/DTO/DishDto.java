@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@ApiModel(value = "dishDto", description = "菜品超类")
+@ApiModel(value = "DishDto", description = "菜品超类")
 public class DishDto extends Dish {
 
     @ApiModelProperty("口味数据")

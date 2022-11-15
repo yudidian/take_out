@@ -27,4 +27,7 @@ public class StoreReviews implements Serializable {
 
     @ApiModelProperty("回复时间")
     public LocalDateTime createTime;
+
+    @ApiModelProperty("店家回复标志 0未回复 1回复")
+    public int isReview;
 }
