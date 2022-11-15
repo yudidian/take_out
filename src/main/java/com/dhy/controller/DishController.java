@@ -45,6 +45,7 @@ public class DishController {
   @PostMapping
   @CacheEvict(cacheNames = "dishList", key = "#dishDto.categoryId")
   @ApiOperation(value = "添加菜品")
+  @ApiImplicitParam(name="dishDto", value = "菜品数据", dataTypeClass = DishDto.class, paramType = "body", required = true)
   public R<String> addDish(@RequestBody DishDto dishDto) {
     dishService.saveDish(dishDto);
     return R.success(null, "添加成功");
@@ -54,9 +55,9 @@ public class DishController {
   @GetMapping("/page")
   @ApiOperation(value = "菜品分页查询")
   @ApiImplicitParams({
-          @ApiImplicitParam(value = "当前页", name="page", dataType = "int", paramType = "query", required = true),
-          @ApiImplicitParam(value = "每页数量", name="pageSize", dataType = "int", paramType = "query", required = true),
-          @ApiImplicitParam(value = "搜索的菜品名称", name="name", dataType = "String", paramType = "query", required = false)
+          @ApiImplicitParam(value = "当前页", name="page", dataType = "int", paramType = "query", required = true, dataTypeClass = int.class),
+          @ApiImplicitParam(value = "每页数量", name="pageSize", dataType = "int", paramType = "query", required = true, dataTypeClass = int.class),
+          @ApiImplicitParam(value = "搜索的菜品名称", name="name", dataType = "String", paramType = "query", required = false, dataTypeClass = String.class)
   })
   public R<Page> getPage(int page, int pageSize, String name) {
     Page<Dish> pageInfo = new Page<>(page, pageSize);
@@ -87,7 +88,7 @@ public class DishController {
   @GetMapping("/{id}")
   @Cacheable(cacheNames = "dishDetail", key = "#id")
   @ApiOperation(value = "根据id 获取添加页面初始信息")
-  @ApiImplicitParam(value = "菜品ID", name="id", dataType = "String", required = true)
+  @ApiImplicitParam(value = "菜品ID", name="id", dataType = "String", required = true, dataTypeClass = String.class, paramType = "path")
   public R<DishDto> getById(@PathVariable Long id) {
     DishDto dishDto = dishService.getByIdWithFlavor(id);
     return R.success(dishDto, "获取成功");
@@ -100,6 +101,7 @@ public class DishController {
           @CacheEvict(cacheNames = "dishList", key = "#dishDto.categoryId")
   })
   @ApiOperation(value = "修改商品信息以及口味表")
+  @ApiImplicitParam(name="dishDto", value = "菜品数据", dataTypeClass = DishDto.class, paramType = "body", required = true)
   public R<String> updateAndFlavor(@RequestBody DishDto dishDto) {
     dishService.updateAndFlavor(dishDto);
     return R.success(null, "修改成功");
@@ -112,6 +114,7 @@ public class DishController {
           @CacheEvict(cacheNames = "dishList", allEntries = true)
   })
   @ApiOperation(value = "批量修改商品")
+  @ApiImplicitParam(name="dishDto", value = "菜品数据", dataTypeClass = DishDto.class, paramType = "body", required = true)
   public R<String> updateAllById(@RequestBody DishDto dishDto) {
     List<String> allId = dishDto.getAllId();
     List<Long> collect = allId.stream().map(Long::valueOf).collect(Collectors.toList());
@@ -125,6 +128,7 @@ public class DishController {
           @CacheEvict(cacheNames = "dishList", key = "#dishDto.categoryId")
   })
   @ApiOperation(value = "根据id修改商品状态(删除或销售状态)")
+  @ApiImplicitParam(name="dishDto", value = "菜品数据", dataTypeClass = DishDto.class, paramType = "body", required = true)
   public R<String> updateStatus(@RequestBody DishDto dishDto) {
     boolean flag = dishService.updateById(dishDto);
     if (flag){

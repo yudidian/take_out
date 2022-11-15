@@ -41,8 +41,8 @@ public class FavoritesListController {
     @GetMapping("/change")
     @ApiOperation(value = "收藏或取消")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "菜品或套餐ID", name = "id", dataType = "Long", required = true, paramType = "query"),
-            @ApiImplicitParam(value = "套餐或者菜品标识", name = "type", dataType = "String", required = true, paramType = "query")
+            @ApiImplicitParam(value = "菜品或套餐ID", name = "id", dataType = "String", required = true, paramType = "query", dataTypeClass = String.class),
+            @ApiImplicitParam(value = "套餐或者菜品标识", name = "type", dataType = "String", required = true, paramType = "query", dataTypeClass = String.class)
     })
     private R<String> addFavorites(@RequestParam Map<String, Object> map, HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
@@ -70,8 +70,8 @@ public class FavoritesListController {
     @GetMapping("/{id}/{type}")
     @ApiOperation(value = "查看对应用户的菜品是否有收藏")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "菜品或者套餐ID", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "type", value = "菜品或者套餐标识1菜品2套餐", required = true, paramType = "query")
+            @ApiImplicitParam(name = "id", value = "菜品或者套餐ID", dataType = "String", required = true, paramType = "query", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "type", value = "菜品或者套餐标识1菜品2套餐", required = true, paramType = "query", dataTypeClass = String.class)
     })
     private R<String> getFavoritesType(@PathVariable Long id, @PathVariable String type, HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
@@ -95,8 +95,8 @@ public class FavoritesListController {
     @GetMapping("/list")
     @ApiOperation(value = "获取用户收藏列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="page", value = "当前页", dataType = "int", required = true, paramType = "query"),
-            @ApiImplicitParam(name="pageSize", value = "每页数量", dataType = "int", required = true, paramType = "query")
+            @ApiImplicitParam(name="page", value = "当前页", dataType = "int", required = true, paramType = "query", dataTypeClass = int.class),
+            @ApiImplicitParam(name="pageSize", value = "每页数量", dataType = "int", required = true, paramType = "query", dataTypeClass = int.class)
     })
     private R<Page<FavoritesListDto>> getFavoritesList(int page, int pageSize,HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());

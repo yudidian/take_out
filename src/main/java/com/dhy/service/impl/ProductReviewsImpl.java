@@ -3,6 +3,7 @@ package com.dhy.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dhy.ApiModel.ReviewsModel;
 import com.dhy.DTO.ProductReviewsDto;
 import com.dhy.common.R;
 import com.dhy.entity.ProductReviews;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,5 +48,29 @@ public class ProductReviewsImpl extends ServiceImpl<ProductReviewsMapper, Produc
         }).collect(Collectors.toList());
         productReviewsDtoPage.setRecords(collect);
         return R.success(productReviewsDtoPage, "获取评论列表成功");
+    }
+
+    @Override
+    public R<Page<ProductReviewsDto>> getAllReviewsList(Map<String, Object> map) {
+        Page<ProductReviews> productReviewsPage = new Page<>(Long.parseLong(map.get("page").toString()), Long.parseLong(map.get("pageSize").toString()));
+        Page<ProductReviewsDto> productReviewsDtoPage = new Page<>();
+        LambdaQueryWrapper<ProductReviews> productReviewsLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        productReviewsLambdaQueryWrapper.eq(map.get("dishId") != null, ProductReviews::getDishId, (Long) map.get("dishId"))
+                .eq(map.get("setmealId") != null, ProductReviews::getSetmealId, (Long) map.get("setmealId"))
+                .orderByDesc(ProductReviews::getCreateTime);
+        this.page(productReviewsPage, productReviewsLambdaQueryWrapper);
+        BeanUtils.copyProperties(productReviewsPage, productReviewsDtoPage, "records");
+
+        List<ProductReviewsDto> collect = productReviewsPage.getRecords().stream().map(item -> {
+            User user = userService.getById(item.getUserId());
+            ProductReviewsDto productReviewsDto = new ProductReviewsDto();
+            BeanUtils.copyProperties(item, productReviewsDto);
+            productReviewsDto.setImages(item.getImage().split(","));
+            productReviewsDto.setAvatar(user.getAvatar());
+            productReviewsDto.setUsername(user.getName());
+            return productReviewsDto;
+        }).collect(Collectors.toList());
+        productReviewsDtoPage.setRecords(collect);
+        return R.success(productReviewsDtoPage, "获取成功");
     }
 }
