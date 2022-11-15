@@ -65,6 +65,13 @@ public class ProductReviewsController {
     //根据商品ID获取评论列表
     @GetMapping("/list")
     @ApiOperation(value = "根据商品ID获取评论列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "dishId", dataType = "String", value = "菜品ID", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "setmealId", dataType = "String", value = "套餐ID", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "reta", dataType = "int", value = "评分等级", dataTypeClass = int.class),
+            @ApiImplicitParam(name = "page", value = "当前页", dataType = "int", required = true, paramType = "query", dataTypeClass = int.class),
+            @ApiImplicitParam(name = "pageSize", value = "每页数量", dataType = "int", required = true, paramType = "query", dataTypeClass = int.class),
+    })
     private R<Page<ProductReviewsDto>> getReviews(Long dishId, Long setmealId, int reta, HttpSession session, int page, int pageSize) {
         // reta 0 表示全部
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
