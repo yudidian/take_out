@@ -2,12 +2,8 @@ package com.dhy.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.dhy.common.R;
-import com.dhy.entity.Dish;
-import com.dhy.entity.Setmeal;
-import com.dhy.entity.User;
-import com.dhy.service.DishService;
-import com.dhy.service.SetmealService;
-import com.dhy.service.UserService;
+import com.dhy.entity.*;
+import com.dhy.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +28,11 @@ public class SourceDataController {
     @Autowired
     private DishService dishService;
 
+    @Autowired
+    private ProductReviewsService productReviewsService;
+
+    @Autowired
+    private OrdersService ordersService;
     @Autowired
     private SetmealService setmealService;
     @ApiOperation(value = "获取总的用户数据")
@@ -73,6 +74,30 @@ public class SourceDataController {
         hashMap.put("second", second);
         hashMap.put("three", three);
         hashMap.put("allSales", allSales);
+        return R.success(hashMap, "获取成功");
+    }
+    @ApiOperation(value = "获取评论情况")
+    @GetMapping("/review")
+    private R<Map<String, Object>> getReviewInfo() {
+        LambdaQueryWrapper<ProductReviews> reviewsLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        reviewsLambdaQueryWrapper.eq(ProductReviews::getRating, 5);
+        int allCount = productReviewsService.count();
+        int goodReviewCount = productReviewsService.count(reviewsLambdaQueryWrapper);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("allCount", allCount);
+        hashMap.put("goodReviewCount", goodReviewCount);
+        return R.success(hashMap, "获取成功");
+    }
+    @ApiOperation(value = "获取订单情况")
+    @GetMapping("/order")
+    private R<Map<String, Object>> getOrdersInfo() {
+        LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        ordersLambdaQueryWrapper.orderByDesc(Orders::getCheckoutTime).last("limit 10");
+        List<Orders> list = ordersService.list(ordersLambdaQueryWrapper);
+        int allCount = ordersService.count();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("allCount", allCount);
+        hashMap.put("list", list);
         return R.success(hashMap, "获取成功");
     }
 }

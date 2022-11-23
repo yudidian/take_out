@@ -3,6 +3,8 @@ package com.dhy.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dhy.DTO.DishDto;
+import com.dhy.ValidatedGroup.DishDeleteGroup;
+import com.dhy.ValidatedGroup.DishSaveGroup;
 import com.dhy.common.R;
 import com.dhy.entity.Category;
 import com.dhy.entity.Dish;
@@ -21,9 +23,11 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.util.Base64Utils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +35,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/dish")
 @ResponseBody
 @Slf4j
+@Validated
 @Api(tags = "菜品相关操作")
 public class DishController {
 
@@ -47,7 +52,8 @@ public class DishController {
     @CacheEvict(cacheNames = "dishList", key = "#dishDto.categoryId")
     @ApiOperation(value = "添加菜品")
     @ApiImplicitParam(name = "dishDto", value = "菜品数据", dataType = "DishDto", dataTypeClass = DishDto.class, paramType = "body", required = true)
-    public R<String> addDish(@RequestBody DishDto dishDto) {
+    @Validated(DishSaveGroup.class)
+    public R<String> addDish(@Valid @RequestBody DishDto dishDto) {
         dishService.saveDish(dishDto);
         return R.success(null, "添加成功");
     }
@@ -126,18 +132,17 @@ public class DishController {
     // 根据id修改商品状态(删除或销售状态)
     @PutMapping("/status")
     @Caching(evict = {
-            @CacheEvict(cacheNames = "dishDetail", key = "#dishDto.id"),
-            @CacheEvict(cacheNames = "dishList", key = "#dishDto.categoryId")
+            @CacheEvict(cacheNames = "dishDetail", key = "#dish.id"),
+            @CacheEvict(cacheNames = "dishList", key = "#dish.categoryId")
     })
     @ApiOperation(value = "根据id修改商品状态(删除或销售状态)")
     @ApiImplicitParam(name = "dishDto", value = "菜品数据", dataTypeClass = DishDto.class, paramType = "body", required = true)
-    public R<String> updateStatus(@RequestBody DishDto dishDto) {
-        boolean flag = dishService.updateById(dishDto);
-        if (flag) {
-            return R.success(null, "修改成功");
-        } else {
-            return R.error("修改商品状态失败");
-        }
+    @Validated(DishDeleteGroup.class)
+    public R<Dish> updateStatus(@Valid @RequestBody Dish dish) {
+        dishService.updateById(dish);
+        Dish dishInfo = dishService.getById(dish.getId());
+        BeanUtils.copyProperties(dishInfo, dish);
+        return R.success(dish, "修改成功");
     }
 
     // 根据菜品分类获取旗下对应的菜品
