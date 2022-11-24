@@ -19,6 +19,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -26,78 +27,84 @@ import java.util.List;
 @EnableKnife4j
 @EnableWebMvc
 public class WebMvcConfig implements WebMvcConfigurer {
-  @Override
-  public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping("/**")
-        .allowedHeaders("*")
-        .allowedMethods("*")
-        .maxAge(1800)
-        .allowedOrigins("*");
-  }
-  public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(new TokenInterceptor())
-        .addPathPatterns("/**")
-        .excludePathPatterns("/employee/login")
-        .excludePathPatterns("/download")
-        .excludePathPatterns("/email/**")
-        .excludePathPatterns("/user/login")
-        .excludePathPatterns("/koala")
-        .excludePathPatterns("/doc.html")
-        .excludePathPatterns("/webjars/**")
-        .excludePathPatterns("/swagger-resources")
-        .excludePathPatterns("/v2/api-docs");
-  }
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedHeaders("*")
+                .allowedMethods("*")
+                .maxAge(1800)
+                .allowedOrigins("*");
+    }
 
-  public void extendMessageConverters(List<HttpMessageConverter<?>> converterList) {
-    MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
-    messageConverter.setObjectMapper(new JacksonObjectMapper());
-    converterList.add(0, messageConverter);
-  }
+    public void addInterceptors(InterceptorRegistry registry) {
+        String[] excludePath = {
+                "/employee/login",
+                "/dish/list",
+                "/category/all",
+                "/download",
+                "/email/**",
+                "/user/login",
+                "/koala",
+                "/doc.html",
+                "/webjars/**",
+                "/swagger-resources",
+                "/v2/api-docs"
+        };
+        registry.addInterceptor(new TokenInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns(excludePath);
+    }
 
-  /**
-   * 添加消息转化类
-   *
-   * @param list
-   */
-  @Override
-  public void configureMessageConverters(List<HttpMessageConverter<?>> list) {
-    MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
-    ObjectMapper objectMapper = jsonConverter.getObjectMapper();
-    //序列换成json时,将所有的long变成string
-    SimpleModule simpleModule = new SimpleModule();
-    simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
-    simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
-    objectMapper.registerModule(simpleModule);
-    list.add(jsonConverter);
-  }
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converterList) {
+        MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
+        messageConverter.setObjectMapper(new JacksonObjectMapper());
+        converterList.add(0, messageConverter);
+    }
 
-  /**
-   * 这个方法是用来配置静态资源的，比如html，js，css，等等
-   */
-  @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
-    registry.addResourceHandler("/doc.html")
-        .addResourceLocations("classpath:/META-INF/resources/");
-    registry.addResourceHandler("/webjars/**")
-        .addResourceLocations("classpath:/META-INF/resources/webjars/");
-  }
+    /**
+     * 添加消息转化类
+     *
+     * @param list
+     */
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> list) {
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        ObjectMapper objectMapper = jsonConverter.getObjectMapper();
+        //序列换成json时,将所有的long变成string
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
+        simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
+        objectMapper.registerModule(simpleModule);
+        list.add(jsonConverter);
+    }
 
-  @Bean
-  public Docket createRestApi() {
-    return new Docket(DocumentationType.SWAGGER_2)
-        .apiInfo(apiInfo())
-        .select()
-        .apis(RequestHandlerSelectors.basePackage("com.dhy.controller"))
-        .paths(PathSelectors.any())
-        .build();
-  }
+    /**
+     * 这个方法是用来配置静态资源的，比如html，js，css，等等
+     */
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/doc.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
 
-  private ApiInfo apiInfo() {
-    return new ApiInfoBuilder()
-        .title("koala")
-        .version("1.0.0")
-        .description("koala外卖接口文档")
-        .build();
-  }
+    @Bean
+    public Docket createRestApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo())
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.dhy.controller"))
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+                .title("koala")
+                .version("1.0.0")
+                .description("koala外卖接口文档")
+                .build();
+    }
 }
