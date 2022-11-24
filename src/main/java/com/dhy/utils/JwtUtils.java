@@ -17,9 +17,7 @@ public class JwtUtils {
     calendar.add(Calendar.DATE, 7);
     // 创建jwt
     JWTCreator.Builder builder = JWT.create();
-    map.forEach((k, v) ->{
-      builder.withClaim(k, v);
-    });
+    map.forEach(builder::withClaim);
     return builder.withExpiresAt(calendar.getTime()).sign(Algorithm.HMAC256(STRING));
   }
   // 验证token 合法性
