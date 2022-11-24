@@ -33,7 +33,7 @@ public class TokenInterceptor implements HandlerInterceptor {
       BaseContext.setCurrentId(id);
       return true;
     } catch (SignatureVerificationException e) {
-      map.put("msg", "无效签名");
+      map.put("msg", "token无效签名");
     } catch (TokenExpiredException e) {
       map.put("msg", "token过期");
     } catch (AlgorithmMismatchException e) {
@@ -43,6 +43,7 @@ public class TokenInterceptor implements HandlerInterceptor {
     }
     map.put("code", 0);
     String json = new ObjectMapper().writeValueAsString(map);
+    response.setStatus(403);
     response.setContentType("application/json;charset=UTF-8");
     response.getWriter().println(json);
     return false;

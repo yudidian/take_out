@@ -63,21 +63,17 @@ public class UserController {
             LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
             userLambdaQueryWrapper.eq(User::getPhone, user.getPhone());
             User one = userService.getOne(userLambdaQueryWrapper);
-            HashMap<String, String> jwt = new HashMap<>();
-            HashMap<String, Object> info = new HashMap<>();
-            jwt.put("phone", one.getPhone());
-            jwt.put("userId", one.getId().toString());
-            Long userId = one.getId();
-            String token = JwtUtils.token(jwt);
-            info.put("token", token);
-            info.put("userId", userId);
-            return R.success(info, "登陆成功");
+            return getMapR(one);
         }
+        return getMapR(userServiceOne);
+    }
+
+    private R<Map<String, Object>> getMapR(User one) {
         HashMap<String, String> jwt = new HashMap<>();
         HashMap<String, Object> info = new HashMap<>();
-        jwt.put("phone", userServiceOne.getPhone());
-        jwt.put("userId", userServiceOne.getId().toString());
-        Long userId = userServiceOne.getId();
+        jwt.put("phone", one.getPhone());
+        jwt.put("userId", one.getId().toString());
+        Long userId = one.getId();
         String token = JwtUtils.token(jwt);
         info.put("token", token);
         info.put("userId", userId);
