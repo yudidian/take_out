@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -148,12 +150,11 @@ public class DishController {
     // 根据菜品分类获取旗下对应的菜品
     @GetMapping("/list")
     @ApiOperation(value = "根据菜品分类获取旗下对应的菜品")
-    @Cacheable(cacheNames = "dishList", key = "#dishDto.categoryId")
+    @Cacheable(cacheNames = "dishList", key = "#categoryId")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "categoryId", value = "分类ID", dataType = "String", dataTypeClass = String.class, required = true)
     })
-    public R<List<DishDto>> listDish(DishDto dishDto) {
-        Long categoryId = dishDto.getCategoryId();
+    public R<List<DishDto>> listDish(@NotNull(message = "分类ID不能为空") @Min(value = 10000000000000000L, message = "ID错误") Long categoryId) {
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(categoryId != null, Dish::getCategoryId, categoryId);
         queryWrapper.eq(Dish::getStatus, 1);
