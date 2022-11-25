@@ -75,6 +75,12 @@ public class FavoritesListController {
             @ApiImplicitParam(name = "type", value = "菜品或者套餐标识1菜品2套餐", required = true, paramType = "query", dataTypeClass = String.class)
     })
     private R<String> getFavoritesType(@PathVariable Long id, @PathVariable String type, @ApiIgnore HttpSession session) {
+        Map<String, Object> map = new HashMap<>();
+        // 未登录放行
+        if (session.getAttribute("useId") == null) {
+            map.put("isFavorites", false);
+            return R.SuccessPlus(map, "获取成功");
+        }
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
         LambdaQueryWrapper<FavoritesList> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(FavoritesList::getUserId, userId);
@@ -84,7 +90,6 @@ public class FavoritesListController {
             queryWrapper.eq(FavoritesList::getSetmealId, id);
         }
         FavoritesList list = favoritesListService.getOne(queryWrapper);
-        Map<String, Object> map = new HashMap<>();
         if (list != null) {
             map.put("isFavorites", true);
         } else {

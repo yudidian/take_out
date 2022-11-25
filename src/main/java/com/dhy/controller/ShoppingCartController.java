@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -48,6 +49,9 @@ public class ShoppingCartController {
 
   @GetMapping("/list")
   public R<List<ShoppingCart>> list(HttpSession session) {
+    if (session.getAttribute("userId") == null) {
+      return R.success(new ArrayList<>(),"用户购物车列表获取成功");
+    }
     Long userId = Long.valueOf(session.getAttribute("userId").toString());
     LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
     queryWrapper.eq(ShoppingCart::getUserId,userId);
