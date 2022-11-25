@@ -39,7 +39,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 "/employee/login",
                 "/dish/list",
                 "/dish/{id}",
-                "/cart/list",
                 "/goods/description/{id}",
                 "/category/all",
                 "/download",
