@@ -40,6 +40,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
         String[] excludePath = {
                 "/employee/login",
                 "/dish/list",
+                "/dish/{id}",
+                "/cart/list",
+                "/goods/description/{id}",
                 "/category/all",
                 "/download",
                 "/email/**",
@@ -48,7 +51,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 "/doc.html",
                 "/webjars/**",
                 "/swagger-resources",
-                "/v2/api-docs"
+                "/v2/api-docs",
+                "/favorites/{id}/{type}"
         };
         registry.addInterceptor(new TokenInterceptor())
                 .addPathPatterns("/**")
