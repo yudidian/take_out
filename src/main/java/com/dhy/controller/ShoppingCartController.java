@@ -50,7 +50,7 @@ public class ShoppingCartController {
   @GetMapping("/list")
   public R<List<ShoppingCart>> list(HttpSession session) {
     if (session.getAttribute("userId") == null) {
-      return R.success(new ArrayList<>(),"用户购物车列表获取成功");
+      return R.success(new ArrayList<>(),"用户购物车列表为空");
     }
     Long userId = Long.valueOf(session.getAttribute("userId").toString());
     LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
