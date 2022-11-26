@@ -33,13 +33,13 @@ public class TokenInterceptor implements HandlerInterceptor {
       BaseContext.setCurrentId(id);
       return true;
     } catch (SignatureVerificationException e) {
-      map.put("msg", "token无效签名");
+      map.put("msg", "无效登录信息");
     } catch (TokenExpiredException e) {
-      map.put("msg", "token过期");
+      map.put("msg", "登录状态过期");
     } catch (AlgorithmMismatchException e) {
-      map.put("msg", "token算法不匹配");
+      map.put("msg", "用户信息错误请重新登录");
     } catch (Exception e) {
-      map.put("msg", "无token");
+      map.put("msg", "未登录");
     }
     map.put("code", 0);
     String json = new ObjectMapper().writeValueAsString(map);
