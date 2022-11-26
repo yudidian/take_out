@@ -124,19 +124,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
             // 查询待派送，已派送订单
             ordersLambdaQueryWrapper.ne(Orders::getStatus, 4);
         }
-        List<Orders> ordersList = this.page(pageList, ordersLambdaQueryWrapper).getRecords();
-        BeanUtils.copyProperties(pageList, ordersDtoPage, "records");
-        List<OrdersDto> collect = ordersList.stream().map(item -> {
-            OrdersDto ordersDto = new OrdersDto();
-            BeanUtils.copyProperties(item, ordersDto);
-            LambdaQueryWrapper<OrderDetail> orderDetailLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            orderDetailLambdaQueryWrapper.eq(OrderDetail::getOrderId, item.getNumber());
-            List<OrderDetail> list = orderDetailService.list(orderDetailLambdaQueryWrapper);
-            ordersDto.setOrderDetailList(list);
-            return ordersDto;
-        }).collect(Collectors.toList());
-        ordersDtoPage.setRecords(collect);
-        return R.success(ordersDtoPage, "订单列表获取成功");
+        return getPageR(pageList, ordersDtoPage, ordersLambdaQueryWrapper);
     }
 
     @Override
@@ -170,6 +158,10 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
             // 查询历史订单（已完成）
             ordersLambdaQueryWrapper.eq(Orders::getStatus, state);
         }
+        return getPageR(pageList, ordersDtoPage, ordersLambdaQueryWrapper);
+    }
+
+    private R<Page<OrdersDto>> getPageR(Page<Orders> pageList, Page<OrdersDto> ordersDtoPage, LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper) {
         List<Orders> ordersList = this.page(pageList, ordersLambdaQueryWrapper).getRecords();
         BeanUtils.copyProperties(pageList, ordersDtoPage, "records");
         List<OrdersDto> collect = ordersList.stream().map(item -> {
