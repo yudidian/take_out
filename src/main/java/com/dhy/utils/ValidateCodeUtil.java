@@ -30,8 +30,8 @@ public class ValidateCodeUtil {
     public String getCode(String email) {
         String code = (String) redisUtil.get(email);
         char[] nonceChars = new char[6];
-        // 验证码为空说明要么没有获取要么失效
-        int sendCount = redisUtil.get("sendCount" + email) == null ? 0 : Integer.parseInt(String.valueOf(redisUtil.get("sendCount"+email)));
+//         验证码为空说明要么没有获取要么失效
+        int sendCount = redisUtil.get(("S" + email)) == null ? 0 : Integer.parseInt(String.valueOf(redisUtil.get("S"+email)));
         // 每天获取三次验证码
         if (sendCount < 4) {
             if (code == null) {
@@ -39,10 +39,10 @@ public class ValidateCodeUtil {
                     nonceChars[index] = randomString.charAt(RANDOM.nextInt(randomString.length()));
                 }
                 redisUtil.set(email, new String(nonceChars), 5*60);
-                redisUtil.set("sendEmailTime"+email, String.valueOf(new Date().getTime()), 60);
-                redisUtil.set("sendCount"+email, String.valueOf(sendCount + 1), 24 * 60 * 60);
+                redisUtil.set("T"+email, String.valueOf(new Date().getTime()), 60);
+                redisUtil.set("S"+email, String.valueOf(sendCount + 1), 24 * 60 * 60);
             } else {
-                if (redisUtil.get("sendEmailTime"+email) != null) {
+                if (redisUtil.get("T"+email) != null) {
                     throw new CustomException("验证码一分钟只能发送一次");
                 }
             }
