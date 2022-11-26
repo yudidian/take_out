@@ -100,4 +100,12 @@ public class SourceDataController {
         hashMap.put("list", list);
         return R.success(hashMap, "获取成功");
     }
+    @ApiOperation(value = "获取订单情况")
+    @GetMapping("/order/count")
+    private R<Map<String, Object>> getAllOrdersCount() {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        int allCount = ordersService.count();
+        hashMap.put("allCount", allCount);
+        return R.success(hashMap, "获取成功");
+    }
 }
