@@ -43,5 +43,4 @@ public class R<T> implements Serializable {
     this.data.put(key, value);
     return this;
   }
-
 }
