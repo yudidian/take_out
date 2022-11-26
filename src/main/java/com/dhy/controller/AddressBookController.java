@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -50,7 +51,7 @@ public class AddressBookController {
         LambdaQueryWrapper<AddressBook> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(AddressBook::getUserId, userId);
         queryWrapper.eq(AddressBook::getId, addressBook.getId());
-        addressBook.setUpdateTime(LocalDateTime.now());
+        addressBook.setUpdateTime(new Date());
         addressBookService.update(addressBook, queryWrapper);
         return R.success(null, "修改成功");
     }
