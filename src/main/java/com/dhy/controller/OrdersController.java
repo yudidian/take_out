@@ -78,6 +78,11 @@ public class OrdersController {
     }
     // 获取订单状态  1待付款，2待派送，3已派送，4已完成
     @GetMapping("/state")
+    @ApiOperation(value = "获取订单状态")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "订单编号", name="number", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(value = "发货标志", name="flag", required = true, dataTypeClass = int.class)
+    })
     private R<Map<String,Object>> getOrders(String number, int flag) {
         // 0 获取当前订单状态， 1 卖家发货
         HashMap<String, Object> hashMap = new HashMap<>();
@@ -96,6 +101,7 @@ public class OrdersController {
     }
     // 获取新订单
     @GetMapping("/new/count")
+    @ApiOperation(value = "获取新订单")
     private R<Integer> getNewsOrder() {
         LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
         ordersLambdaQueryWrapper.eq(Orders::getStatus, 2);
@@ -105,11 +111,31 @@ public class OrdersController {
     @GetMapping("/manage/list")
     @ApiOperation(value = "管理页面获取订单列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(value = "当前页", name="page", required = true),
-            @ApiImplicitParam(value = "每页数量", name="pageSize", required = true),
-            @ApiImplicitParam(value = "订单的状态", name="state", required = true)
+            @ApiImplicitParam(value = "当前页", name="page", required = true, dataTypeClass = int.class),
+            @ApiImplicitParam(value = "每页数量", name="pageSize", required = true, dataTypeClass = int.class),
+            @ApiImplicitParam(value = "订单的状态", name="state", required = true, dataTypeClass = int.class)
     })
     private R<Page<OrdersDto>> manageGetAllOrdersList(int page, int pageSize, int state) {
         return ordersService.manageGetAllOrdersList(page, pageSize, state);
+    }
+    @GetMapping("/cancel")
+    @ApiOperation(value = "取消订单")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "订单号", name="number", required = true, dataTypeClass = String.class),
+    })
+    private R<Map<String, Object>> manageGetAllOrdersList(String number) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        ordersLambdaQueryWrapper.eq(Orders::getNumber, number);
+        Orders orders = ordersService.getOne(ordersLambdaQueryWrapper);
+        if (orders.getStatus() != 2) {
+            hashMap.put("cancel", false);
+            return R.success(hashMap, "订单已不能取消");
+        } else {
+            // 取消订单
+            ordersService.removeById(orders.getId());
+            hashMap.put("cancel", true);
+            return R.success(hashMap, "订单已取消");
+        }
     }
 }
