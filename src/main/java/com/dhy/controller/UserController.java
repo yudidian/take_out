@@ -8,6 +8,7 @@ import com.dhy.entity.User;
 import com.dhy.service.UserService;
 import com.dhy.utils.JwtUtils;
 import com.dhy.utils.RedisUtil;
+import com.dhy.utils.UUIDUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,8 +76,11 @@ public class UserController {
         jwt.put("userId", one.getId().toString());
         Long userId = one.getId();
         String token = JwtUtils.token(jwt);
+        String uuid = UUIDUtils.getUUID();
+        redisUtil.set(userId.toString(), userId.toString());
         info.put("token", token);
         info.put("userId", userId);
+        info.put("uuid", uuid);
         return R.success(info, "登陆成功");
     }
 

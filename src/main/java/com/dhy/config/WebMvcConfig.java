@@ -38,6 +38,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     public void addInterceptors(InterceptorRegistry registry) {
         String[] excludePath = {
+                "/ws/**",
                 "/employee/login",
                 "/dish/list",
                 "/dish/{id}",
