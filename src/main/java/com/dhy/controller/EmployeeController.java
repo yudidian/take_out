@@ -49,6 +49,7 @@ public class EmployeeController {
     request.getSession().setAttribute("id", emp.getId());
     data.put("token", JwtUtils.token(map));
     data.put("username", emp.getUsername());
+    data.put("userId", emp.getId().toString());
     return R.SuccessPlus(data, "登录成功");
   }
 
