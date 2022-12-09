@@ -2,6 +2,7 @@ package com.dhy.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.dhy.VO.ChartVo;
 import com.dhy.entity.Chart;
 import com.dhy.entity.Employee;
 import com.dhy.entity.User;
@@ -22,6 +23,7 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Api(value = "聊天室控制类")
 @ServerEndpoint("/websocket/chart")
@@ -103,7 +105,7 @@ public class ChartController {
             employeeService = applicationContext.getBean(EmployeeService.class);
             chartService = applicationContext.getBean(ChartService.class);
             Employee employee = employeeService.getById(Long.valueOf(managerId));
-            Map<String, List<Chart>> userMessageList = getUserMessageList();
+            Map<String, List<ChartVo>> userMessageList = getUserMessageList();
             this.sendMessage(JSONObject.toJSONString(userMessageList));
             chart.setUserId(Long.valueOf(managerId));
             chart.setManagerId(employee.getId());
@@ -112,11 +114,7 @@ public class ChartController {
             chart.setSendFlag(0);
             this.chart = chart;
             clients.put(managerId, this);
-            LambdaQueryWrapper<Chart> chartLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            chartLambdaQueryWrapper.groupBy(Chart::getUserId).orderByDesc(Chart::getCreateTime);
         }
-        log.info("现在来连接的客户id：{}====={}", map.get("userId"), map.get("managerId"));
-        log.info("有新连接加入！ 当前在线人数 :{}", onlineNumber);
     }
 
     @OnClose
@@ -154,7 +152,7 @@ public class ChartController {
             List<Chart> messageList = getMineMessageList(userId);
             chartController.sendMessageTo(JSONObject.toJSONString(messageList), chartController.session);
             if (managerServer != null) {
-                Map<String, List<Chart>> userMessageList = getUserMessageList();
+                Map<String, List<ChartVo>> userMessageList = getUserMessageList();
                 chartController.sendMessageTo(JSONObject.toJSONString(userMessageList), managerServer.session);
             }
         } else {
@@ -173,7 +171,7 @@ public class ChartController {
                 chartService.save(item);
             });
             chartController.getChartArrayList().clear();
-            Map<String, List<Chart>> userMessageList = getUserMessageList();
+            Map<String, List<ChartVo>> userMessageList = getUserMessageList();
             chartController.sendMessageTo(JSONObject.toJSONString(userMessageList), chartController.session);
             if (userServer != null) {
                 List<Chart> messageList = getMineMessageList(userId);
@@ -223,19 +221,27 @@ public class ChartController {
         return chartService.list(chartLambdaQueryWrapper);
     }
 
-    public Map<String, List<Chart>> getUserMessageList() {
+    public Map<String, List<ChartVo>> getUserMessageList() {
         chartService = applicationContext.getBean(ChartService.class);
         LambdaQueryWrapper<Chart> chartLambdaQueryWrapper = new LambdaQueryWrapper<>();
         chartLambdaQueryWrapper
                 .orderByAsc(Chart::getCreateTime)
                 .groupBy(Chart::getUserId);
         List<Chart> list = chartService.list(chartLambdaQueryWrapper);
-        HashMap<String, List<Chart>> hashMap = new HashMap<>();
+        HashMap<String, List<ChartVo>> hashMap = new HashMap<>();
         list.forEach(item -> {
             LambdaQueryWrapper<Chart> chartQuery = new LambdaQueryWrapper<>();
             chartQuery.eq(Chart::getUserId, item.getUserId()).orderByAsc(Chart::getCreateTime);
             List<Chart> chartList = chartService.list(chartQuery);
-            hashMap.put(item.getUserId().toString(), chartList);
+            List<ChartVo> chartVoList = chartList.stream().map(chart -> {
+                ChartVo chartVo = new ChartVo();
+                chartVo.setManagerId(chart.getManagerId() == null ? null : chart.getManagerId().toString());
+                chartVo.setUserId(chart.getUserId() == null ? null : chart.getUserId().toString());
+                BeanUtils.copyProperties(chart, chartVo, "managerId", "userId");
+                return chartVo;
+            }).collect(Collectors.toList());
+
+            hashMap.put(item.getUserId().toString(), chartVoList);
         });
         return hashMap;
     }
