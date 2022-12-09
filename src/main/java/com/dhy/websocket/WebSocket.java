@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -22,14 +23,41 @@ public class WebSocket {
 
     private int count = 0;
     private String userId;
-    //存放websocket的集合（本次demo不会用到，聊天室的demo会用到）
     private static final CopyOnWriteArraySet<WebSocket> webSocketSet = new CopyOnWriteArraySet<>();
 
     //前端请求时一个websocket时
     @OnOpen
     public void onOpen(Session session) {
         this.session = session;
+        Map<String, String> map = new HashMap<>();
+        String queryString = session.getQueryString();
+        String[] query = queryString.split("&");
+        for (String s : query) {
+            String[] keyAndValue = s.split("=");
+            map.put(keyAndValue[0], keyAndValue[1]);
+        }
+        String userId = map.get("userId");
+        this.userId = userId;
         webSocketSet.add(this);
+        try {
+            webSocketSet.forEach(item -> {
+                if (Objects.equals(item.userId, userId)) {
+                    item.count++;
+                }
+                log.info("用户ID: {}， count: {}, userId: {}", item.userId, item.count, userId);
+                if (item.count >= 2) {
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put("flag", false);
+                    hashMap.put("msg", "用户重复登录");
+                    String jsonString = JSONObject.toJSONString(hashMap);
+                    item.sendMessage(jsonString);
+                    item.count = 1;
+                    throw new RuntimeException();
+                }
+            });
+        } catch (RuntimeException ignored) {
+            this.onClose();
+        }
     }
 
     //前端关闭时一个websocket时
@@ -42,26 +70,7 @@ public class WebSocket {
     @OnMessage
     public void onMessage(String message) {
         JSONObject jsonObject = JSONObject.parseObject(message);
-        this.userId = jsonObject.getString("userId");
-        try {
-            webSocketSet.forEach(item -> {
-                log.info("【websocket消息】{}", item.userId);
-                if (Objects.equals(item.userId, this.userId)) {
-                    this.count++;
-                }
-                if (this.count >= 2) {
-                    HashMap<String, Object> hashMap = new HashMap<>();
-                    hashMap.put("flag", false);
-                    hashMap.put("msg", "用户重复登录");
-                    String jsonString = JSONObject.toJSONString(hashMap);
-                    this.sendMessage(jsonString);
-                    this.count = 0;
-                    throw new RuntimeException();
-                }
-            });
-        } catch (RuntimeException ignored) {
-            this.onClose();
-        }
+        String userId = jsonObject.getString("userId");
     }
 
     //新增一个方法用于主动向客户端发送消息
