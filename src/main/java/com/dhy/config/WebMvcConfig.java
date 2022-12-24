@@ -38,6 +38,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         String[] excludePath = {
                 "/ws/**",
                 "/employee/login",
+                "/swiper/**",
                 "/dish/list",
                 "/dish/{id}",
                 "/goods/description/{id}",
