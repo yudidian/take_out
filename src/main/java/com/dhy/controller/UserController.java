@@ -38,7 +38,7 @@ public class UserController {
     @PostMapping("/login")
     public R<Map<String, Object>> login(@RequestBody Map<String, Object> map) {
         if (!map.get("code").toString().equals("deng11")) {
-            String code = (String) redisUtil.get(map.get("phone").toString());
+            String code = (String) redisUtil.get(map.get("email").toString());
             if (code == null) {
                 return R.error("未获取验证码或验证码失效");
             }
@@ -50,14 +50,14 @@ public class UserController {
                 return R.error("验证码错误");
             }
             // 验证码正确清除验证码
-            redisUtil.delete(map.get("phone").toString());
+            redisUtil.delete(map.get("email").toString());
         }
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(User::getPhone, map.get("phone"));
+        queryWrapper.eq(User::getPhone, map.get("email"));
         User userServiceOne = userService.getOne(queryWrapper);
         if (userServiceOne == null) {
             User user = new User();
-            user.setPhone(map.get("phone").toString());
+            user.setPhone(map.get("email").toString());
             user.setName(RandomUtil.randomString(6));
             user.setSex("0");
             userService.save(user);
@@ -72,7 +72,7 @@ public class UserController {
     private R<Map<String, Object>> getMapR(User one) {
         HashMap<String, String> jwt = new HashMap<>();
         HashMap<String, Object> info = new HashMap<>();
-        jwt.put("phone", one.getPhone());
+        jwt.put("email", one.getPhone());
         jwt.put("userId", one.getId().toString());
         Long userId = one.getId();
         String token = JwtUtils.token(jwt);
