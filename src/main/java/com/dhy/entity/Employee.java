@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class Employee implements Serializable {
@@ -18,6 +19,8 @@ public class Employee implements Serializable {
   private String username;
 
   private String name;
+
+  private String permission;
 
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String password;
@@ -32,10 +35,10 @@ public class Employee implements Serializable {
   private Integer status;
 
   @TableField(fill = FieldFill.INSERT)
-  private LocalDateTime createTime;
+  private Date createTime;
 
   @TableField(fill = FieldFill.INSERT_UPDATE)
-  private LocalDateTime updateTime;
+  private Date updateTime;
 
   @TableField(fill = FieldFill.INSERT)
   private Long createUser;
