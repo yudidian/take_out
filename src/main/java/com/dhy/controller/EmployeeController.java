@@ -1,6 +1,7 @@
 package com.dhy.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dhy.common.R;
 import com.dhy.entity.Employee;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -49,6 +52,7 @@ public class EmployeeController {
     request.getSession().setAttribute("id", emp.getId());
     data.put("token", JwtUtils.token(map));
     data.put("username", emp.getUsername());
+    data.put("permission", emp.getPermission());
     data.put("userId", emp.getId().toString());
     return R.SuccessPlus(data, "登录成功");
   }
@@ -62,9 +66,10 @@ public class EmployeeController {
    */
   @PostMapping
   public R<String> addEmployee(@RequestBody Employee employee, HttpServletRequest request) {
+    employee.setPermission("1002");
     employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-    employee.setCreateTime(LocalDateTime.now());
-    employee.setUpdateTime(LocalDateTime.now());
+    employee.setCreateTime(new Date());
+    employee.setUpdateTime(new Date());
     employee.setCreateUser((Long) request.getSession().getAttribute("id"));
     employee.setUpdateUser((Long) request.getSession().getAttribute("id"));
 
@@ -76,9 +81,9 @@ public class EmployeeController {
    * 分页部分
    */
   @GetMapping("/page")
-  public R<Page> page(int page, int pageSize, String name) {
+  public R<Page<Employee>> page(int page, int pageSize, String name) {
     // 分页构造器
-    Page pageInfo = new Page(page, pageSize);
+    Page<Employee> pageInfo = new Page<>(page, pageSize);
     LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
     queryWrapper.like(name != null, Employee::getName, name);
     queryWrapper.orderByDesc(Employee::getUpdateTime);
@@ -98,5 +103,17 @@ public class EmployeeController {
     queryWrapper.eq(Employee::getId, employee.getId());
     employeeService.update(employee, queryWrapper);
     return R.success(null, "员工信息修改成功");
+  }
+  @PutMapping("/permission")
+  public R<HashMap<String,Object>> updatePermission(@RequestBody Employee employee) {
+    if (employee.getId() == 1) {
+      return R.error("超级管理员权限不能编辑！");
+    }
+    LambdaUpdateWrapper<Employee> employeeLambdaQueryWrapper = new LambdaUpdateWrapper<>();
+    employeeLambdaQueryWrapper.eq(Employee::getId, employee.getId()).set(Employee::getPermission, employee.getPermission());
+    employeeService.update(employeeLambdaQueryWrapper);
+    HashMap<String, Object> hashMap = new HashMap<>();
+    hashMap.put("permission", employee.getPermission());
+    return R.success(hashMap, "修改成功");
   }
 }
