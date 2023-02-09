@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,10 +92,18 @@ public class OrdersController {
             ordersLambdaQueryWrapper.eq(Orders::getNumber,number);
             Orders orders = ordersService.getOne(ordersLambdaQueryWrapper);
             hashMap.put("state", orders.getStatus());
+            // 下单时间
+            hashMap.put("orderTime", orders.getOrderTime());
+            // 付款时间
+            hashMap.put("checkoutTime", orders.getCheckoutTime());
+            // 出餐时间
+            hashMap.put("dinnerOutTime", orders.getDinnerOutTime());
+            // 订单完成时间
+            hashMap.put("orderCompleteTime", orders.getOrderCompleteTime());
             return R.SuccessPlus(hashMap, "当前订单状态获取成功");
         } else {
             LambdaUpdateWrapper<Orders> ordersLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-            ordersLambdaUpdateWrapper.eq(Orders::getNumber,number).set(Orders::getStatus,3);
+            ordersLambdaUpdateWrapper.eq(Orders::getNumber,number).set(Orders::getStatus,3).set(Orders::getDinnerOutTime, new Date());
             ordersService.update(ordersLambdaUpdateWrapper);
             return R.SuccessPlus(hashMap, "已发货");
         }

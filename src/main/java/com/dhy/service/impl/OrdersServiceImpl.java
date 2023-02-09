@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -132,7 +133,9 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         // 确认收货
         if (flag) {
             LambdaUpdateWrapper<Orders> ordersLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-            ordersLambdaUpdateWrapper.set(Orders::getStatus, 4);
+            ordersLambdaUpdateWrapper.eq(Orders::getNumber,number)
+                    .set(Orders::getStatus, 4)
+                    .set(Orders::getOrderCompleteTime, new Date());
             this.update(ordersLambdaUpdateWrapper);
             return R.success(null, "确认收货完成");
         } else {
