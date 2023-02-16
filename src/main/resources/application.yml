@@ -39,11 +39,19 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
+<<<<<<< .mine
       url: jdbc:mysql://localhost:3306/take_out?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
       username: take_out
       password: root
 #      username: root
 #      password: admin
+=======
+      url: jdbc:mysql://localhost:3306/take_out?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=GMT%2B8
+#      username: take_outB
+#      password: root
+      username: root
+      password: admin
+>>>>>>> .theirs
   web:
     resources:
       static-locations: classpath:/static/
