@@ -38,7 +38,7 @@ public class StoreReviewsController {
         StoreReviews reviews = storeReviewsService.getOne(storeReviewsLambdaQueryWrapper);
         if (reviews != null) {
             storeReviewsService.update(storeReviews,storeReviewsLambdaQueryWrapper);
-            return R.error("修改成功");
+            return R.success(null, "修改成功");
         }
         storeReviews.setCreateTime(LocalDateTime.now());
         storeReviews.setIsReview(1);

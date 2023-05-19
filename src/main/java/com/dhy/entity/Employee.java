@@ -35,10 +35,10 @@ public class Employee implements Serializable {
   private Integer status;
 
   @TableField(fill = FieldFill.INSERT)
-  private Date createTime;
+  private LocalDateTime createTime;
 
   @TableField(fill = FieldFill.INSERT_UPDATE)
-  private Date updateTime;
+  private LocalDateTime updateTime;
 
   @TableField(fill = FieldFill.INSERT)
   private Long createUser;

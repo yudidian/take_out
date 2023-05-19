@@ -9,6 +9,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 套餐
@@ -50,10 +51,8 @@ public class Setmeal implements Serializable {
     private String image;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

@@ -54,8 +54,7 @@ public class DishController {
     @CacheEvict(cacheNames = "dishList", key = "#dishDto.categoryId")
     @ApiOperation(value = "添加菜品")
     @ApiImplicitParam(name = "dishDto", value = "菜品数据", dataType = "DishDto", dataTypeClass = DishDto.class, paramType = "body", required = true)
-    @Validated(DishSaveGroup.class)
-    public R<String> addDish(@Valid @RequestBody DishDto dishDto) {
+    public R<String> addDish(@RequestBody DishDto dishDto) {
         dishService.saveDish(dishDto);
         return R.success(null, "添加成功");
     }

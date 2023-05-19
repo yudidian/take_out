@@ -6,6 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 套餐菜品关系
@@ -40,11 +41,9 @@ public class SetmealDish implements Serializable {
     private Integer sort;
 
 
-    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
 

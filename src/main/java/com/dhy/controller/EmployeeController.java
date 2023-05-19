@@ -14,6 +14,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,8 +69,8 @@ public class EmployeeController {
   public R<String> addEmployee(@RequestBody Employee employee, HttpServletRequest request) {
     employee.setPermission("1002");
     employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-    employee.setCreateTime(new Date());
-    employee.setUpdateTime(new Date());
+    employee.setCreateTime(LocalDateTime.now());
+    employee.setUpdateTime(LocalDateTime.now());
     employee.setCreateUser((Long) request.getSession().getAttribute("id"));
     employee.setUpdateUser((Long) request.getSession().getAttribute("id"));
 
@@ -104,16 +105,21 @@ public class EmployeeController {
     employeeService.update(employee, queryWrapper);
     return R.success(null, "员工信息修改成功");
   }
+
   @PutMapping("/permission")
-  public R<HashMap<String,Object>> updatePermission(@RequestBody Employee employee) {
+  public R<HashMap<String, Object>> updatePermission(@RequestBody Employee employee, HttpSession session) {
+    Long userId = Long.valueOf(session.getAttribute("userId").toString());
     if (employee.getId() == 1) {
       return R.error("超级管理员权限不能编辑！");
     }
     LambdaUpdateWrapper<Employee> employeeLambdaQueryWrapper = new LambdaUpdateWrapper<>();
     employeeLambdaQueryWrapper.eq(Employee::getId, employee.getId()).set(Employee::getPermission, employee.getPermission());
     employeeService.update(employeeLambdaQueryWrapper);
+    LambdaQueryWrapper<Employee> ep = new LambdaQueryWrapper<>();
+    ep.eq(Employee::getId, userId);
+    Employee one = employeeService.getOne(ep);
     HashMap<String, Object> hashMap = new HashMap<>();
-    hashMap.put("permission", employee.getPermission());
+    hashMap.put("permission", one.getPermission());
     return R.success(hashMap, "修改成功");
   }
 }

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -17,7 +18,7 @@ public class Swiper {
     public String imageUrl;
 
     @ApiModelProperty(value = "创建时间")
-    public Date createTime;
+    public LocalDateTime createTime;
 
     @ApiModelProperty(value = "创建人ID")
     public Long createUser;

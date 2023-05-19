@@ -13,15 +13,20 @@ import com.dhy.mapper.SetmealMapper;
 import com.dhy.service.CategoryService;
 import com.dhy.service.SetmealDishService;
 import com.dhy.service.SetmealService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> implements SetmealService {
   @Autowired
   private SetmealDishService setmealDishService;
@@ -30,12 +35,17 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
   private CategoryService categoryService;
   @Override
   public void saveSetmealAndSetmealDish(SetmealDto setmealDto) {
+    setmealDto.setCreateTime(LocalDateTime.now());
+    setmealDto.setUpdateTime(LocalDateTime.now());
     //保存套餐
     this.save(setmealDto);
     List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes();
     List<SetmealDish> collect = setmealDishes.stream().peek(item -> {
       item.setSetmealId(setmealDto.getId());
+      item.setCreateTime(LocalDateTime.now());
+      item.setUpdateTime(LocalDateTime.now());
     }).collect(Collectors.toList());
+    log.info("collect{}", collect);
     setmealDishService.saveBatch(collect);
   }
 
@@ -60,6 +70,8 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
   @Override
   public void updateSetmealAndSetmealDish(SetmealDto setmealDto) {
+//    setmealDto.setUpdateTime(new Date().getTime());
+    setmealDto.setUpdateTime(LocalDateTime.now());
     this.updateById(setmealDto);
     LambdaUpdateWrapper<SetmealDish> updateWrapper = new LambdaUpdateWrapper<>();
     setmealDishService.updateBatchById(setmealDto.getSetmealDishes());

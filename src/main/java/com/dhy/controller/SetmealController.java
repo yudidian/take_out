@@ -9,14 +9,17 @@ import com.dhy.entity.Category;
 import com.dhy.entity.Setmeal;
 import com.dhy.service.SetmealDishService;
 import com.dhy.service.SetmealService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/setmeal")
 @ResponseBody
+@Slf4j
 public class SetmealController {
   @Autowired
   private SetmealService setmealService;
@@ -36,7 +39,7 @@ public class SetmealController {
   }
 
   // 修改套餐
-  @PutMapping
+  @PutMapping()
   public R<String> updateMeal(@RequestBody SetmealDto setmealDto) {
     setmealService.updateSetmealAndSetmealDish(setmealDto);
     return R.success(null, "修改成功");
@@ -58,8 +61,10 @@ public class SetmealController {
     return R.success(null, "修改成功");
   }
 
-  @DeleteMapping("/list")
-  public R<String> deleteList(@RequestParam List<Long> ids) {
+  @PostMapping("/list/delete")
+  public R<String> deleteList(@RequestBody Map<String, Object> map) {
+    List<Long> ids = (List<Long>) map.get("ids");
+    log.info("ids{}", ids);
     setmealService.deleteByIds(ids);
     return R.success(null, "删除成功");
   }

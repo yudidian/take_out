@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.dhy.ValidatedGroup.DishDeleteGroup;
 import com.dhy.ValidatedGroup.DishSaveGroup;
 import com.dhy.ValidatedGroup.DishUpdateGroup;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,7 +15,6 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 
 /**
@@ -89,11 +87,11 @@ public class Dish implements Serializable {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @TableField(fill = FieldFill.INSERT)
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     @ApiModelProperty("更新时间")
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @TableField(fill = FieldFill.INSERT)

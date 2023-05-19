@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class SwiperController {
     private R<String> addSwiperList(@Validated @RequestBody Swiper swiper, HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
         swiper.setCreateUser(userId);
-        swiper.setCreateTime(new Date());
+        swiper.setCreateTime(LocalDateTime.now());
         swiperService.save(swiper);
         return R.success(null,"添加成功");
     }
@@ -41,7 +42,7 @@ public class SwiperController {
     private R<String> updateSwiperList(@Validated @RequestBody Swiper swiper, HttpSession session) {
         Long userId = Long.valueOf(session.getAttribute("userId").toString());
         swiper.setCreateUser(userId);
-        swiper.setCreateTime(new Date());
+        swiper.setCreateTime(LocalDateTime.now());
         swiperService.updateById(swiper);
         return R.success(null,"修改成功");
     }
